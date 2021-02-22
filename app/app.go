@@ -80,6 +80,9 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	appparams "github.com/seantking/interchain-account/app/params"
+	ibcaccount "github.com/seantking/interchain-account/x/ibc-account"
+	ibcaccountkeeper "github.com/seantking/interchain-account/x/ibc-account/keeper"
+	ibcaccounttypes "github.com/seantking/interchain-account/x/ibc-account/types"
 	"github.com/seantking/interchain-account/x/interchainaccount"
 	interchainaccountkeeper "github.com/seantking/interchain-account/x/interchainaccount/keeper"
 	interchainaccounttypes "github.com/seantking/interchain-account/x/interchainaccount/types"
@@ -132,6 +135,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		interchainaccount.AppModuleBasic{},
+		ibcaccount.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -200,10 +204,12 @@ type App struct {
 	TransferKeeper   ibctransferkeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper        capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper   capabilitykeeper.ScopedKeeper
+	ScopedIbcAccountKeeper capabilitykeeper.ScopedKeeper
 
 	interchainaccountKeeper interchainaccountkeeper.Keeper
+	ibcAccountKeeper        ibcaccountkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -234,6 +240,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		interchainaccounttypes.StoreKey,
+		ibcaccounttypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -261,6 +268,7 @@ func New(
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedIbcAccountKeeper := app.CapabilityKeeper.ScopeToModule(ibcaccounttypes.ModuleName)
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -333,6 +341,15 @@ func New(
 		appCodec, keys[interchainaccounttypes.StoreKey], keys[interchainaccounttypes.MemStoreKey],
 	)
 
+	app.ibcAccountKeeper = ibcaccountkeeper.NewKeeper(keys[ibcaccounttypes.MemStoreKey], appCodec, keys[ibcaccounttypes.StoreKey],
+		map[string]ibcaccounttypes.TxEncoder{
+			// register the tx encoder for cosmos-sdk
+			"cosmos-sdk": ibcaccountkeeper.SerializeCosmosTx(appCodec, interfaceRegistry),
+		}, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		app.AccountKeeper, scopedIbcAccountKeeper, app.Router(),
+	)
+	ibcAccountModule := ibcaccount.NewAppModule(app.ibcAccountKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	app.GovKeeper = govkeeper.NewKeeper(
@@ -370,6 +387,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		interchainaccount.NewAppModule(appCodec, app.interchainaccountKeeper),
+		ibcAccountModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -404,6 +422,7 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		interchainaccounttypes.ModuleName,
+		ibcaccounttypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -445,6 +464,7 @@ func New(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.ScopedIbcAccountKeeper = scopedIbcAccountKeeper
 
 	return app
 }
