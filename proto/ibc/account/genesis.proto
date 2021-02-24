@@ -1,0 +1,11 @@
+syntax = "proto3";
+package ibc.account;
+
+option go_package = "github.com/seantking/interchainaccount/x/ibc-account/types";
+
+import "gogoproto/gogo.proto";
+
+// GenesisState defines the ibc-account genesis state
+message GenesisState {
+    string   port_id                 = 1 [(gogoproto.moretags) = "yaml:\"port_id\""];
+}
