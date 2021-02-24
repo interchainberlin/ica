@@ -7,6 +7,5 @@ option go_package = "github.com/seantking/interchain-account/x/interchainaccount
 
 // GenesisState defines the capability module's genesis state.
 message GenesisState {
-    // this line is used by starport scaffolding # genesis/proto/state
+  // this line is used by starport scaffolding # genesis/proto/state
 }
-
