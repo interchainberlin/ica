@@ -29,11 +29,11 @@ jobs:
       - name: Compile
         run: |
           go mod download
-          cd cmd/interchainaccountd
+          cd cmd/icad
           go build .
 
       - uses: actions/upload-artifact@v2
         with:
-          name: interchainaccountd ${{ matrix.targetos }} ${{ matrix.arch }}
-          path: cmd/interchainaccountd/interchainaccountd
+          name: icad ${{ matrix.targetos }} ${{ matrix.arch }}
+          path: cmd/icad/icad
 

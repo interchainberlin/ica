@@ -79,7 +79,7 @@ func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 }
 
 var _Query_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "seantking.interchainaccount.interchainaccount.Query",
+	ServiceName: "interchainberlin.interchainaccount.interchainaccount.Query",
 	HandlerType: (*QueryServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams:     []grpc.StreamDesc{},

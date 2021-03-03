@@ -2,8 +2,8 @@ package interchainaccount
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/seantking/interchain-account/x/interchainaccount/keeper"
-	"github.com/seantking/interchain-account/x/interchainaccount/types"
+	"github.com/interchainberlin/ica/x/interchainaccount/keeper"
+	"github.com/interchainberlin/ica/x/interchainaccount/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis
