@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/seantking/interchain-account/x/interchainaccount/keeper"
-	"github.com/seantking/interchain-account/x/interchainaccount/types"
+	"github.com/interchainberlin/ica/x/interchainaccount/keeper"
+	"github.com/interchainberlin/ica/x/interchainaccount/types"
 )
 
 // NewHandler ...

@@ -8,7 +8,7 @@ import (
 	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
 	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
 
-	"github.com/seantking/interchain-account/x/ibc-account/types"
+	"github.com/interchainberlin/ica/x/ibc-account/types"
 )
 
 func (k Keeper) OnChanOpenInit(

@@ -10,7 +10,7 @@ import (
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/seantking/interchain-account/x/interchainaccount/types"
+	"github.com/interchainberlin/ica/x/interchainaccount/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module

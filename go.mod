@@ -1,4 +1,4 @@
-module github.com/seantking/interchain-account
+module github.com/interchainberlin/ica
 
 go 1.15
 

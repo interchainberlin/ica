@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/seantking/interchain-account/x/ibc-account/keeper"
-	"github.com/seantking/interchain-account/x/ibc-account/types"
+	"github.com/interchainberlin/ica/x/ibc-account/keeper"
+	"github.com/interchainberlin/ica/x/ibc-account/types"
 )
 
 func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, state types.GenesisState) {

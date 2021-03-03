@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/seantking/interchain-account/x/interchainaccount/types"
+	"github.com/interchainberlin/ica/x/interchainaccount/types"
 )
 
 var _ types.QueryServer = Keeper{}

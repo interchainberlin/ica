@@ -3,6 +3,7 @@ package interchainaccount
 import (
 	"encoding/json"
 	"fmt"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/gorilla/mux"
@@ -16,10 +17,10 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/seantking/interchain-account/x/interchainaccount/client/cli"
-	"github.com/seantking/interchain-account/x/interchainaccount/client/rest"
-	"github.com/seantking/interchain-account/x/interchainaccount/keeper"
-	"github.com/seantking/interchain-account/x/interchainaccount/types"
+	"github.com/interchainberlin/ica/x/interchainaccount/client/cli"
+	"github.com/interchainberlin/ica/x/interchainaccount/client/rest"
+	"github.com/interchainberlin/ica/x/interchainaccount/keeper"
+	"github.com/interchainberlin/ica/x/interchainaccount/types"
 )
 
 var (

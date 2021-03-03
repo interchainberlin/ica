@@ -12,7 +12,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/seantking/interchain-account/x/ibc-account/types"
+	"github.com/interchainberlin/ica/x/ibc-account/types"
 )
 
 func SerializeCosmosTx(cdc codec.BinaryMarshaler, registry codectypes.InterfaceRegistry) func(data interface{}) ([]byte, error) {

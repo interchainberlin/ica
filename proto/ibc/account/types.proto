@@ -3,7 +3,7 @@ package ibc.account;
 
 import "google/protobuf/any.proto";
 
-option go_package = "github.com/seantking/interchainaccount/x/ibc-account/types";
+option go_package = "github.com/interchainberlin/interchainaccount/x/ibc-account/types";
 
 message IBCTxRaw { bytes body_bytes = 1; }
 

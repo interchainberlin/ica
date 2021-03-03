@@ -60,7 +60,7 @@ func (m *GenesisState) XXX_DiscardUnknown() {
 var xxx_messageInfo_GenesisState proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*GenesisState)(nil), "seantking.interchainaccount.interchainaccount.GenesisState")
+	proto.RegisterType((*GenesisState)(nil), "interchainberlin.interchainaccount.interchainaccount.GenesisState")
 }
 
 func init() { proto.RegisterFile("interchainaccount/genesis.proto", fileDescriptor_c2a48ea3cb2d68b6) }
