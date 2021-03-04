@@ -1,11 +1,11 @@
 syntax = "proto3";
-package seantking.interchainaccount.interchainaccount;
+package interchainberlin.interchainaccount.interchainaccount;
 
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
 
-option go_package = "github.com/seantking/interchain-account/x/interchainaccount/types";
+option go_package = "github.com/interchainberlin/ica/x/interchainaccount/types";
 
 // Query defines the gRPC querier service.
 service Query {
