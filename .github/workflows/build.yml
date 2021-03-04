@@ -4,7 +4,11 @@ name: interchainaccount
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 # This workflow makes x86_64 binaries for mac, windows, and linux.
 
@@ -36,4 +40,3 @@ jobs:
         with:
           name: icad ${{ matrix.targetos }} ${{ matrix.arch }}
           path: cmd/icad/icad
-
