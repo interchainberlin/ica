@@ -6,7 +6,11 @@
 # TODO: Replace this with a system that fetches SOS-light, loop-mounts the image, modifies hostname, adds docker compose run, and exits.
 
 name: Rpi
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   pi:
