@@ -136,7 +136,7 @@ var (
 		vesting.AppModuleBasic{},
 		interchainaccount.AppModuleBasic{},
 		ibcaccount.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
+	// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
@@ -325,9 +325,19 @@ func New(
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
+	app.ibcAccountKeeper = ibcaccountkeeper.NewKeeper(keys[ibcaccounttypes.MemStoreKey], appCodec, keys[ibcaccounttypes.StoreKey],
+		map[string]ibcaccounttypes.TxEncoder{
+			// register the tx encoder for cosmos-sdk
+			"cosmos-sdk": ibcaccountkeeper.SerializeCosmosTx(appCodec, interfaceRegistry),
+		}, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		app.AccountKeeper, scopedIbcAccountKeeper, app.Router(),
+	)
+	ibcAccountModule := ibcaccount.NewAppModule(app.ibcAccountKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	ibcRouter.AddRoute(ibcaccounttypes.ModuleName, ibcAccountModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
@@ -340,15 +350,6 @@ func New(
 	app.interchainaccountKeeper = *interchainaccountkeeper.NewKeeper(
 		appCodec, keys[interchainaccounttypes.StoreKey], keys[interchainaccounttypes.MemStoreKey],
 	)
-
-	app.ibcAccountKeeper = ibcaccountkeeper.NewKeeper(keys[ibcaccounttypes.MemStoreKey], appCodec, keys[ibcaccounttypes.StoreKey],
-		map[string]ibcaccounttypes.TxEncoder{
-			// register the tx encoder for cosmos-sdk
-			"cosmos-sdk": ibcaccountkeeper.SerializeCosmosTx(appCodec, interfaceRegistry),
-		}, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, scopedIbcAccountKeeper, app.Router(),
-	)
-	ibcAccountModule := ibcaccount.NewAppModule(app.ibcAccountKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
