@@ -66,7 +66,7 @@ all: install
 
 install: go.sum
 		@echo "--> Installing icad"
-		@go install -mod=readonly $(BUILD_FLAGS) ./cmd/icad
+		@go install $(BUILD_FLAGS) ./cmd/icad
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"

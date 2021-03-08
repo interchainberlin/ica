@@ -89,6 +89,9 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	intertx "github.com/interchainberlin/ica/x/inter-tx"
+	intertxkeeper "github.com/interchainberlin/ica/x/inter-tx/keeper"
+	intertxtypes "github.com/interchainberlin/ica/x/inter-tx/types"
 )
 
 const Name = "interchainaccount"
@@ -136,6 +139,7 @@ var (
 		vesting.AppModuleBasic{},
 		interchainaccount.AppModuleBasic{},
 		ibcaccount.AppModuleBasic{},
+		intertx.AppModuleBasic{},
 	// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -210,6 +214,7 @@ type App struct {
 
 	interchainaccountKeeper interchainaccountkeeper.Keeper
 	ibcAccountKeeper        ibcaccountkeeper.Keeper
+	interTxKeeper           intertxkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -240,7 +245,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		interchainaccounttypes.StoreKey,
-		ibcaccounttypes.StoreKey,
+		ibcaccounttypes.StoreKey, intertxtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -334,6 +339,8 @@ func New(
 	)
 	ibcAccountModule := ibcaccount.NewAppModule(app.ibcAccountKeeper)
 
+	app.interTxKeeper = intertxkeeper.NewKeeper(appCodec, keys[intertxtypes.StoreKey], app.ibcAccountKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
@@ -389,6 +396,7 @@ func New(
 		transferModule,
 		interchainaccount.NewAppModule(appCodec, app.interchainaccountKeeper),
 		ibcAccountModule,
+		intertx.NewAppModule(appCodec, app.interTxKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 

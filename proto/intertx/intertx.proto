@@ -1,0 +1,19 @@
+syntax = "proto3";
+package intertx;
+
+option go_package = "github.com/interchainberlin/ica/x/inter-tx/types";
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+message Salt {
+  int32 salt = 1;
+}
+
+// RegistrationQueue -
+message RegistrationQueue {
+  // the addresses ...
+  repeated bytes addresses = 1
+      [ (gogoproto.casttype) =
+            "github.com/cosmos/cosmos-sdk/types.AccAddress" ];
+}

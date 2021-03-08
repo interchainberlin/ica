@@ -1,5 +1,5 @@
 syntax = "proto3";
-package interchainberlin.interchainaccount.interchainaccount;
+package interchainaccount;
 
 // this line is used by starport scaffolding # genesis/proto/import
 

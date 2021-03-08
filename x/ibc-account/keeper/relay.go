@@ -52,7 +52,11 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 		timeoutTimestamp,
 	)
 
-	return k.channelKeeper.SendPacket(ctx, channelCap, packet)
+	if err := k.channelKeeper.SendPacket(ctx, channelCap, packet); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // TryRunTx try to send messages to source channel.

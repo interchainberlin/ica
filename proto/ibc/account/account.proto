@@ -18,8 +18,8 @@ message IBCAccount {
     (gogoproto.embed) = true,
     (gogoproto.moretags) = "yaml:\"base_account\""
   ];
-  string sourcePort = 2;
-  string sourceChannel = 3;
-  string destinationPort = 4;
-  string destinationChannel = 5;
+  string source_port = 2;
+  string source_channel = 3;
+  string destination_port = 4;
+  string destination_channel = 5;
 }
