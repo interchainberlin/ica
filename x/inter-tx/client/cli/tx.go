@@ -31,15 +31,15 @@ func GetTxCmd() *cobra.Command {
 
 	// this line is used by starport scaffolding # 1
 	cmd.AddCommand(
-		NewSendTempCmd(),
+		NewRegisterAccountCmd(),
 	)
 
 	return cmd
 }
 
-func NewSendTempCmd() *cobra.Command {
+func NewRegisterAccountCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "send-temp [src-port] [src-channel]",
+		Use:  "register [src-port] [src-channel]",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -88,9 +88,7 @@ func NewSendTempCmd() *cobra.Command {
 					timeoutTimestamp = consensusState.GetTimestamp() + timeoutTimestamp
 				}
 			}
-			//cdc := codec.NewProtoCodec(clientCtx.InterfaceRegistry)
 
-			// TODO
 			msg := types.NewMsgRegisterAccount(
 				srcPort,
 				srcChannel,

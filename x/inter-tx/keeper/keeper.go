@@ -59,18 +59,6 @@ func (keeper Keeper) GetIBCAccount(ctx sdk.Context, sourcePort, sourceChannel st
 	return bz, nil
 }
 
-//func (keeper Keeper) TrySendCoins(ctx sdk.Context, sourcePort, sourceChannel string, typ string, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error {
-//	ibcAccount, err := keeper.GetIBCAccount(ctx, sourcePort, sourceChannel, fromAddr)
-//	if err != nil {
-//		return err
-//	}
-//
-//	//fmt.Print(msg)
-//
-//	//	_, err = keeper.iaKeeper.TryRunTx(ctx, sourcePort, sourceChannel, typ, msg)
-//	return err
-//}
-
 func (keeper Keeper) GetIncrementalSalt(ctx sdk.Context) string {
 	kvStore := ctx.KVStore(keeper.storeKey)
 
