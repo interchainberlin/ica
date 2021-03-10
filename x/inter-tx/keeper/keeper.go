@@ -67,11 +67,9 @@ func (keeper Keeper) TrySendCoins(ctx sdk.Context, sourcePort, sourceChannel str
 		return err
 	}
 
-	msg := banktypes.NewMsgSend(ibcAccount, toAddr, amt)
-
 	fmt.Print(msg)
 
-	//_, err = keeper.iaKeeper.TryRunTx(ctx, sourcePort, sourceChannel, typ, msg)
+	_, err = keeper.iaKeeper.TryRunTx(ctx, sourcePort, sourceChannel, typ, msg)
 	return err
 }
 
