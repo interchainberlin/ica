@@ -83,9 +83,6 @@ import (
 	ibcaccount "github.com/interchainberlin/ica/x/ibc-account"
 	ibcaccountkeeper "github.com/interchainberlin/ica/x/ibc-account/keeper"
 	ibcaccounttypes "github.com/interchainberlin/ica/x/ibc-account/types"
-	"github.com/interchainberlin/ica/x/interchainaccount"
-	interchainaccountkeeper "github.com/interchainberlin/ica/x/interchainaccount/keeper"
-	interchainaccounttypes "github.com/interchainberlin/ica/x/interchainaccount/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -137,7 +134,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		interchainaccount.AppModuleBasic{},
 		ibcaccount.AppModuleBasic{},
 		intertx.AppModuleBasic{},
 	// this line is used by starport scaffolding # stargate/app/moduleBasic
@@ -212,9 +208,8 @@ type App struct {
 	ScopedTransferKeeper   capabilitykeeper.ScopedKeeper
 	ScopedIbcAccountKeeper capabilitykeeper.ScopedKeeper
 
-	interchainaccountKeeper interchainaccountkeeper.Keeper
-	ibcAccountKeeper        ibcaccountkeeper.Keeper
-	interTxKeeper           intertxkeeper.Keeper
+	ibcAccountKeeper ibcaccountkeeper.Keeper
+	interTxKeeper    intertxkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -244,7 +239,6 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		interchainaccounttypes.StoreKey,
 		ibcaccounttypes.StoreKey, intertxtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
@@ -354,10 +348,6 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.interchainaccountKeeper = *interchainaccountkeeper.NewKeeper(
-		appCodec, keys[interchainaccounttypes.StoreKey], keys[interchainaccounttypes.MemStoreKey],
-	)
-
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	app.GovKeeper = govkeeper.NewKeeper(
@@ -394,7 +384,6 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		interchainaccount.NewAppModule(appCodec, app.interchainaccountKeeper),
 		ibcAccountModule,
 		intertx.NewAppModule(appCodec, app.interTxKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
@@ -430,7 +419,6 @@ func New(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		interchainaccounttypes.ModuleName,
 		ibcaccounttypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
