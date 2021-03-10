@@ -79,7 +79,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	cdc codec.BinaryMarshaler, key sdk.StoreKey,
 	txEncoders map[string]types.TxEncoder, channelKeeper types.ChannelKeeper, portKeeper types.PortKeeper,
-	accountKeeper types.AccountKeeper, scopedKeeper capabilitykeeper.ScopedKeeper, router types.Router,
+	accountKeeper types.AccountKeeper, scopedKeeper capabilitykeeper.ScopedKeeper, router types.Router, hook types.IBCAccountHooks,
 ) Keeper {
 	return Keeper{
 		storeKey:      key,
@@ -91,6 +91,7 @@ func NewKeeper(
 		scopedKeeper:  scopedKeeper,
 		router:        router,
 		memKey:        memKey,
+		hook:          hook,
 	}
 }
 

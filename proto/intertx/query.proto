@@ -10,10 +10,7 @@ import "ibc/account/account.proto";
 
 // Query defines the gRPC querier service.
 service Query {
-  rpc IBCAccountFromAddress(QueryIBCAccountFromAddressRequest) returns (QueryIBCAccountFromAddressResponse) {
-    option (google.api.http).get =
-      "/cosmos/ibc-account/v1beta1/ibc-account/{port}/{channel}/{account}";
-  }
+  rpc IBCAccountFromAddress(QueryIBCAccountFromAddressRequest) returns (QueryIBCAccountFromAddressResponse); 
 }
 
 message QueryIBCAccountFromAddressRequest {
@@ -22,11 +19,15 @@ message QueryIBCAccountFromAddressRequest {
 
   string port = 1;
   string channel = 2;
-  string address = 3;
+  bytes address = 3
+    [ (gogoproto.casttype) =
+       "github.com/cosmos/cosmos-sdk/types.AccAddress"];
 }
  
 message QueryIBCAccountFromAddressResponse {
-  // account defines the account of the corresponding address.
-  ibc.account.IBCAccount account = 1;
+  bytes address = 1
+        [ (gogoproto.casttype) =
+       "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+
 }
 

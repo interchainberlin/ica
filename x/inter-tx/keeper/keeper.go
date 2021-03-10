@@ -47,16 +47,19 @@ func (keeper Keeper) RegisterInterchainAccount(
 	return nil
 }
 
-func (keeper Keeper) GetIBCAccount(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) ([]byte, error) {
+func (keeper Keeper) GetIBCAccount(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) (types.QueryIBCAccountFromAddressResponse, error) {
 	store := ctx.KVStore(keeper.storeKey)
 
 	key := types.KeyRegisteredAccount(sourcePort, sourceChannel, address)
 	if !store.Has(key) {
-		return []byte{}, types.ErrIAAccountNotExist
+		return types.QueryIBCAccountFromAddressResponse{}, types.ErrIAAccountNotExist
 	}
-	bz := store.Get(key)
+	res := types.QueryIBCAccountFromAddressResponse{}
+	addr := store.Get(key)
 
-	return bz, nil
+	res.Address = addr
+
+	return res, nil
 }
 
 func (keeper Keeper) GetIncrementalSalt(ctx sdk.Context) string {

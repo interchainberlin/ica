@@ -91,7 +91,7 @@ import (
 	intertxtypes "github.com/interchainberlin/ica/x/inter-tx/types"
 )
 
-const Name = "interchainaccount"
+const Name = "ica"
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
 
@@ -329,7 +329,7 @@ func New(
 			// register the tx encoder for cosmos-sdk
 			"cosmos-sdk": ibcaccountkeeper.SerializeCosmosTx(appCodec, interfaceRegistry),
 		}, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, scopedIbcAccountKeeper, app.Router(),
+		app.AccountKeeper, scopedIbcAccountKeeper, app.Router(), app,
 	)
 	ibcAccountModule := ibcaccount.NewAppModule(app.ibcAccountKeeper)
 
@@ -617,4 +617,16 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
+}
+
+func (app *App) OnAccountCreated(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) {
+	app.interTxKeeper.OnAccountCreated(ctx, sourcePort, sourceChannel, address)
+}
+
+func (*App) OnTxSucceeded(ctx sdk.Context, sourcePort, sourceChannel string, txHash []byte, txBytes []byte) {
+	// noop
+}
+
+func (*App) OnTxFailed(ctx sdk.Context, sourcePort, sourceChannel string, txHash []byte, txBytes []byte) {
+	// noop
 }
