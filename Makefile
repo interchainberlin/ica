@@ -40,10 +40,10 @@ proto-lint:
 ###                                Initialize                               ###
 ###############################################################################
 start-dev: install
-	./init.sh
+	./network/init.sh
 
 start-rly:
-	./rly/interchain-acc-config/rly.sh
+	./network/relayer/interchain-acc-config/rly.sh
 
 kill-dev:
 	rm -rf ~/.demo-test-1

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/interchainberlin/ica/x/inter-tx/types"
 )
@@ -28,8 +29,8 @@ func (k msgServer) Register(
 
 	// check if an account is already registered
 	_, err = k.GetIBCAccount(ctx, msg.SourcePort, msg.SourceChannel, acc)
-	if err != nil {
-		return &types.MsgRegisterAccountResponse{}, err
+	if err == nil {
+		return &types.MsgRegisterAccountResponse{}, fmt.Errorf("Interchain account is already registered for this account")
 	}
 
 	err = k.RegisterIBCAccount(

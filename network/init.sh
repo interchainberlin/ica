@@ -1,6 +1,9 @@
+#!/bin/bash
+DEV_MNEMONIC_1="alley afraid soup fall idea toss can goose become valve initial strong forward bright dish figure check leopard decide warfare hub unusual join cart"
+DEV_MNEMONIC_2="record gift you once hip style during joke field prize dust unique length more pencil transfer quit train device arrive energy sort steak upset"
 
 ### Chain 1
-icad keys add val --home ~/.demo-test-1
+yes $DEV_MNEMONIC_1 | icad keys add val --recover --home ~/.demo-test-1
 
 icad init --chain-id test-1 test-1 --home ~/.demo-test-1
 
@@ -14,7 +17,7 @@ icad gentx val 7000000000stake --chain-id test-1 --home ~/.demo-test-1
 icad collect-gentxs --home ~/.demo-test-1
 
 ### Chain 2
-icad keys add val2 --home ~/.demo-test-2
+yes $DEV_MNEMONIC_2 | icad keys add val2 --recover --home ~/.demo-test-2
 
 icad init --chain-id test-2 test-2 --home ~/.demo-test-2
 
