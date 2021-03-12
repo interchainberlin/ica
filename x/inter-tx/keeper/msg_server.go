@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/interchainberlin/ica/x/inter-tx/types"
 )
@@ -22,11 +21,18 @@ func (k msgServer) Register(
 	msg *types.MsgRegisterAccount,
 ) (*types.MsgRegisterAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	fmt.Println(ctx)
-	acc, _ := sdk.AccAddressFromBech32(msg.Owner)
-	fmt.Println(acc)
+	acc, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return &types.MsgRegisterAccountResponse{}, err
+	}
 
-	_ = k.RegisterInterchainAccount(
+	// check if an account is already registered
+	_, err = k.GetIBCAccount(ctx, msg.SourcePort, msg.SourceChannel, acc)
+	if err != nil {
+		return &types.MsgRegisterAccountResponse{}, err
+	}
+
+	err = k.RegisterIBCAccount(
 		ctx,
 		acc,
 		msg.SourcePort,
@@ -34,6 +40,9 @@ func (k msgServer) Register(
 		msg.TimeoutHeight,
 		msg.TimeoutTimestamp,
 	)
+	if err != nil {
+		return &types.MsgRegisterAccountResponse{}, err
+	}
 
 	return &types.MsgRegisterAccountResponse{}, nil
 }

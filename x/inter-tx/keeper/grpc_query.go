@@ -8,13 +8,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"fmt"
 	"github.com/interchainberlin/ica/x/inter-tx/types"
 )
 
 // IBCAccountFromData implements the Query/IBCAccount gRPC method
 func (k Keeper) IBCAccountFromAddress(ctx context.Context, req *types.QueryIBCAccountFromAddressRequest) (*types.QueryIBCAccountFromAddressResponse, error) {
-	fmt.Println("sean")
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
