@@ -27,7 +27,7 @@ make start-rly
 
 ```bash
 # Register an IBC Account on chain test-2 
-icad tx intertx register ibcaccount channel-0 --from val --chain-id test-1 --gas 90000 --home ~/.demo-test-1 --node tcp://localhost:16657
+icad tx intertx register ibcaccount channel-0 --from val1 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657
 
 # Query for an IBC Account registered on behalf of an address (returns the address of the ibc account registered on chain test-2)
 icad query intertx ibcaccount <address used to register account (val is used above)> ibcaccount channel-0 --node tcp://localhost:16657
