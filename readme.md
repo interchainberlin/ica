@@ -3,25 +3,36 @@ This repo contains an ongoing refactor/update of https://github.com/chainapsis/c
 
 ## Local Demo
 
-##### Setup
-```
+### Setup
+
+```bash
+# Clone this repository and build
+git clone https://github.com/interchainberlin/ica.git
+cd ica
+make install 
+
+# Clone relayer and build
+https://github.com/cosmos/relayer.git
+cd relayer
+make install
+
+# Bootstrap two local chains
 make start-dev
-// In a seperate terminal
+
+# Use relayer to link the chains
 make start-rly
 ```
 
-##### Register an IBC Account on chain test-2 
-```
+### Demo
+
+```bash
+# Register an IBC Account on chain test-2 
 icad tx intertx register ibcaccount channel-0 --from val --chain-id test-1 --gas 90000 --home ~/.demo-test-1 --node tcp://localhost:16657
-```
 
-##### Query for an IBC Account registered on behalf of an address (returns the address of the ibc account registered on chain test-2)
-```
+# Query for an IBC Account registered on behalf of an address (returns the address of the ibc account registered on chain test-2)
 icad query intertx ibcaccount <address used to register account (val is used above)> ibcaccount channel-0 --node tcp://localhost:16657
-```
 
-##### Query for an IBC Account directly on chain test-2 by address (return value of the previous query)
-```
+# Query for an IBC Account directly on chain test-2 by address (return value of the previous query)
 icad query ibcaccount ibcaccount <address (output of previous command)> --node tcp://localhost:26657
 ```
 
