@@ -39,14 +39,13 @@ proto-lint:
 ###############################################################################
 ###                                Initialize                               ###
 ###############################################################################
-start-dev: install
+start-dev:
 	./network/init.sh
 
 start-rly:
 	./network/relayer/interchain-acc-config/rly.sh
 
 kill-dev:
-	rm -rf ~/.demo-test-1
-	rm -rf ~/.demo-test-2
-	rm -rf ~/.relayer
+	@echo "Killing icad and removing previous data"
 	killall icad
+	rm -rf ./data
