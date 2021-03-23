@@ -39,7 +39,15 @@ proto-lint:
 ###############################################################################
 ###                                Initialize                               ###
 ###############################################################################
-start-dev: install
+
+init: kill-dev install 
+	@echo "Initializing both blockchains..."
+	./network/init.sh
+	@echo "Initializing relayer..." 
+	./network/relayer/interchain-acc-config/rly.sh
+
+start: 
+	@echo "Starting up test network"
 	./network/init.sh
 
 start-rly:
@@ -47,4 +55,5 @@ start-rly:
 
 kill-dev:
 	@echo "Killing icad and removing previous data"
-	rm -rf ./data killall icad
+	rm -rf ./data
+	-@killall icad 2>/dev/null
