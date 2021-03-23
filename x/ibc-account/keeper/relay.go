@@ -131,7 +131,7 @@ func (k Keeper) createOutgoingPacket(
 
 	timeoutHeight := clienttypes.Height{
 		RevisionNumber: 2,
-		RevisionHeight: 1916502603380168555,
+		RevisionHeight: ^uint64(0),
 	}
 
 	const timeoutTimestamp = ^uint64(0)
