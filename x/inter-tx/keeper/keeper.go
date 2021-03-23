@@ -3,6 +3,8 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
 	ibcacckeeper "github.com/interchainberlin/ica/x/ibc-account/keeper"
 )
 
@@ -21,4 +23,25 @@ func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey, iaKeeper ibcacckeeper
 
 		iaKeeper: iaKeeper,
 	}
+}
+
+func (keeper Keeper) TrySendCoins(ctx sdk.Context,
+	sourcePort,
+	sourceChannel string,
+	typ string,
+	fromAddr sdk.AccAddress,
+	toAddr sdk.AccAddress,
+	amt sdk.Coins,
+	timeoutHeight clienttypes.Height,
+	timeoutTimestamp uint64,
+) error {
+	ibcAccount, err := keeper.GetIBCAccount(ctx, sourcePort, sourceChannel, fromAddr)
+	if err != nil {
+		return err
+	}
+
+	msg := banktypes.NewMsgSend(ibcAccount.Address, toAddr, amt)
+
+	_, err = keeper.iaKeeper.TryRunTx(ctx, sourcePort, sourceChannel, typ, msg, timeoutHeight, timeoutTimestamp)
+	return err
 }

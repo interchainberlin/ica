@@ -10,7 +10,7 @@ import (
 )
 
 // RegisterIBCAccount performs registering IBC account.
-// It will generate the deterministic address by hashing {sourcePort}/{sourceChannel}{salt}.
+// It will generate the deterministic address by hashing {sourcePort}/{sourceChannel}/{salt}.
 func (k Keeper) registerIBCAccount(ctx sdk.Context, sourcePort, sourceChannel, destPort, destChannel string, salt []byte) (types.IBCAccountI, error) {
 	identifier := types.GetIdentifier(destPort, destChannel)
 	address := k.GenerateAddress(identifier, salt)

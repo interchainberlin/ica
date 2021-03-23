@@ -28,6 +28,5 @@ message QueryIBCAccountFromAddressResponse {
   bytes address = 1
         [ (gogoproto.casttype) =
        "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-
 }
 

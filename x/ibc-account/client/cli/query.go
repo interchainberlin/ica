@@ -35,7 +35,6 @@ func GetIBCAccountCmd() *cobra.Command {
 			}
 
 			address, addrErr := sdk.AccAddressFromBech32(args[0])
-
 			queryClient := types.NewQueryClient(clientCtx)
 			if addrErr == nil {
 				res, err := queryClient.IBCAccount(context.Background(), &types.QueryIBCAccountRequest{Address: address.String()})

@@ -24,7 +24,6 @@ make start-rly
 ```
 
 ### Demo
-
 ```bash
 # Register an IBC Account on chain test-2 
 icad tx intertx register ibcaccount channel-0 --from val1 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657

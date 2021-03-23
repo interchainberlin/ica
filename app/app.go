@@ -624,9 +624,7 @@ func (app *App) OnAccountCreated(ctx sdk.Context, sourcePort, sourceChannel stri
 }
 
 func (*App) OnTxSucceeded(ctx sdk.Context, sourcePort, sourceChannel string, txHash []byte, txBytes []byte) {
-	// noop
 }
 
 func (*App) OnTxFailed(ctx sdk.Context, sourcePort, sourceChannel string, txHash []byte, txBytes []byte) {
-	// noop
 }

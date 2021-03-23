@@ -47,5 +47,4 @@ start-rly:
 
 kill-dev:
 	@echo "Killing icad and removing previous data"
-	killall icad
-	rm -rf ./data
+	rm -rf ./data killall icad

@@ -83,6 +83,7 @@ func (k Keeper) createOutgoingPacket(
 	timeoutHeight clienttypes.Height,
 	timeoutTimestamp uint64,
 ) ([]byte, error) {
+
 	if data == nil {
 		return []byte{}, types.ErrInvalidOutgoingData
 	}
