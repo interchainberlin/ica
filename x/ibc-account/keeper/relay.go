@@ -15,7 +15,7 @@ import (
 // TryRegisterIBCAccount try to register IBC account to source channel.
 // If no source channel exists or doesn't have capability, it will return error.
 // Salt is used to generate deterministic address.
-func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel string, salt []byte, timeoutHeight clienttypes.Height, timeoutTimestamp uint64) error {
+func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel string, salt []byte) error {
 	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)
 	if !found {
 		return sdkerrors.Wrap(channeltypes.ErrChannelNotFound, sourceChannel)
@@ -40,7 +40,11 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 		Data: salt,
 	}
 
-	// TODO: Add timeout height and timestamp
+	height := clienttypes.Height{
+		RevisionNumber: 2,
+		RevisionHeight: 1916502603380168555,
+	}
+
 	packet := channeltypes.NewPacket(
 		packetData.GetBytes(),
 		sequence,
@@ -48,8 +52,8 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 		sourceChannel,
 		destinationPort,
 		destinationChannel,
-		timeoutHeight,
-		timeoutTimestamp,
+		height,
+		^uint64(0),
 	)
 
 	if err := k.channelKeeper.SendPacket(ctx, channelCap, packet); err != nil {
@@ -60,7 +64,7 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 }
 
 // TryRunTx try to send messages to source channel.
-func (k Keeper) TryRunTx(ctx sdk.Context, sourcePort, sourceChannel, typ string, data interface{}, timeoutHeight clienttypes.Height, timeoutTimestamp uint64) ([]byte, error) {
+func (k Keeper) TryRunTx(ctx sdk.Context, sourcePort, sourceChannel, typ string, data interface{}) ([]byte, error) {
 	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)
 	if !found {
 		return []byte{}, sdkerrors.Wrap(channeltypes.ErrChannelNotFound, sourceChannel)
@@ -69,7 +73,7 @@ func (k Keeper) TryRunTx(ctx sdk.Context, sourcePort, sourceChannel, typ string,
 	destinationPort := sourceChannelEnd.GetCounterparty().GetPortID()
 	destinationChannel := sourceChannelEnd.GetCounterparty().GetChannelID()
 
-	return k.createOutgoingPacket(ctx, sourcePort, sourceChannel, destinationPort, destinationChannel, typ, data, timeoutHeight, timeoutTimestamp)
+	return k.createOutgoingPacket(ctx, sourcePort, sourceChannel, destinationPort, destinationChannel, typ, data)
 }
 
 func (k Keeper) createOutgoingPacket(
@@ -80,8 +84,6 @@ func (k Keeper) createOutgoingPacket(
 	destinationChannel,
 	typ string,
 	data interface{},
-	timeoutHeight clienttypes.Height,
-	timeoutTimestamp uint64,
 ) ([]byte, error) {
 
 	if data == nil {
@@ -125,7 +127,11 @@ func (k Keeper) createOutgoingPacket(
 		Data: txBytes,
 	}
 
-	// TODO: Add timeout height and timestamp
+	height := clienttypes.Height{
+		RevisionNumber: 2,
+		RevisionHeight: 1916502603380168555,
+	}
+
 	packet := channeltypes.NewPacket(
 		packetData.GetBytes(),
 		sequence,
@@ -133,8 +139,8 @@ func (k Keeper) createOutgoingPacket(
 		sourceChannel,
 		destinationPort,
 		destinationChannel,
-		timeoutHeight,
-		timeoutTimestamp,
+		height,
+		^uint64(0),
 	)
 
 	return k.ComputeVirtualTxHash(packetData.Data, packet.Sequence), k.channelKeeper.SendPacket(ctx, channelCap, packet)

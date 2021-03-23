@@ -10,8 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/interchainberlin/ica/x/inter-tx/types"
 
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	channelutils "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/client/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -52,50 +50,9 @@ func GetRegisterAccountCmd() *cobra.Command {
 			srcPort := args[0]
 			srcChannel := args[1]
 
-			timeoutHeightStr, err := cmd.Flags().GetString(flagPacketTimeoutHeight)
-			if err != nil {
-				return err
-			}
-			timeoutHeight, err := clienttypes.ParseHeight(timeoutHeightStr)
-			if err != nil {
-				return err
-			}
-
-			timeoutTimestamp, err := cmd.Flags().GetUint64(flagPacketTimeoutTimestamp)
-			if err != nil {
-				return err
-			}
-
-			absoluteTimeouts, err := cmd.Flags().GetBool(flagAbsoluteTimeouts)
-			if err != nil {
-				return err
-			}
-
-			// if the timeouts are not absolute, retrieve latest block height and block timestamp
-			// for the consensus state connected to the destination port/channel
-			if !absoluteTimeouts {
-				consensusState, height, _, err := channelutils.QueryLatestConsensusState(clientCtx, srcPort, srcChannel)
-				if err != nil {
-					return err
-				}
-
-				if !timeoutHeight.IsZero() {
-					absoluteHeight := height
-					absoluteHeight.RevisionNumber += timeoutHeight.RevisionNumber
-					absoluteHeight.RevisionHeight += timeoutHeight.RevisionHeight
-					timeoutHeight = absoluteHeight
-				}
-
-				if timeoutTimestamp != 0 {
-					timeoutTimestamp = consensusState.GetTimestamp() + timeoutTimestamp
-				}
-			}
-
 			msg := types.NewMsgRegisterAccount(
 				srcPort,
 				srcChannel,
-				timeoutHeight,
-				timeoutTimestamp,
 				clientCtx.GetFromAddress().String(),
 			)
 
@@ -108,9 +65,6 @@ func GetRegisterAccountCmd() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().String(flagPacketTimeoutHeight, "0-1000", "Packet timeout block height. The timeout is disabled when set to 0-0.")
-	cmd.Flags().Uint64(flagPacketTimeoutTimestamp, uint64((time.Duration(10) * time.Minute).Nanoseconds()), "Packet timeout timestamp in nanoseconds. Default is 10 minutes. The timeout is disabled when set to 0.")
-	cmd.Flags().Bool(flagAbsoluteTimeouts, false, "Timeout flags are used as absolute timeouts.")
 
 	return cmd
 }
@@ -135,51 +89,10 @@ func GetSendTxCmd() *cobra.Command {
 			srcPort := args[4]
 			srcChannel := args[5]
 
-			timeoutHeightStr, err := cmd.Flags().GetString(flagPacketTimeoutHeight)
-			if err != nil {
-				return err
-			}
-			timeoutHeight, err := clienttypes.ParseHeight(timeoutHeightStr)
-			if err != nil {
-				return err
-			}
-
-			timeoutTimestamp, err := cmd.Flags().GetUint64(flagPacketTimeoutTimestamp)
-			if err != nil {
-				return err
-			}
-
-			absoluteTimeouts, err := cmd.Flags().GetBool(flagAbsoluteTimeouts)
-			if err != nil {
-				return err
-			}
-
-			// if the timeouts are not absolute, retrieve latest block height and block timestamp
-			// for the consensus state connected to the destination port/channel
-			if !absoluteTimeouts {
-				consensusState, height, _, err := channelutils.QueryLatestConsensusState(clientCtx, srcPort, srcChannel)
-				if err != nil {
-					return err
-				}
-
-				if !timeoutHeight.IsZero() {
-					absoluteHeight := height
-					absoluteHeight.RevisionNumber += timeoutHeight.RevisionNumber
-					absoluteHeight.RevisionHeight += timeoutHeight.RevisionHeight
-					timeoutHeight = absoluteHeight
-				}
-
-				if timeoutTimestamp != 0 {
-					timeoutTimestamp = consensusState.GetTimestamp() + timeoutTimestamp
-				}
-			}
-
 			msg := types.NewMsgSend(
 				chainType,
 				srcPort,
 				srcChannel,
-				timeoutHeight,
-				timeoutTimestamp,
 				fromAddress,
 				toAddress,
 				amount,

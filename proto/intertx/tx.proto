@@ -26,14 +26,6 @@ message MsgRegisterAccount {
   // the channel by which the packet will be sent
   string source_channel = 3 [(gogoproto.moretags) = "yaml:\"source_channel\""];
 
-  // Timeout height relative to the current block height.
-  // The timeout is disabled when set to 0.
-  ibc.core.client.v1.Height timeout_height = 4
-      [(gogoproto.moretags) = "yaml:\"timeout_height\"", (gogoproto.nullable) = false];
-
-  // Timeout timestamp (in nanoseconds) relative to the current block timestamp.
-  // The timeout is disabled when set to 0.
-  uint64 timeout_timestamp = 5 [(gogoproto.moretags) = "yaml:\"timeout_timestamp\""];
   string owner=6;
 }
 
@@ -50,15 +42,6 @@ message MsgSend {
 
   // the channel by which the packet will be sent
   string source_channel = 3 [(gogoproto.moretags) = "yaml:\"source_channel\""];
-
-  // Timeout height relative to the current block height.
-  // The timeout is disabled when set to 0.
-  ibc.core.client.v1.Height timeout_height = 4
-      [(gogoproto.moretags) = "yaml:\"timeout_height\"", (gogoproto.nullable) = false];
-
-  // Timeout timestamp (in nanoseconds) relative to the current block timestamp.
-  // The timeout is disabled when set to 0.
-  uint64 timeout_timestamp = 5 [(gogoproto.moretags) = "yaml:\"timeout_timestamp\""];
 
   string   sender                    = 6 [(gogoproto.moretags) = "yaml:\"from_address\""];
   string   to_address                      = 7 [(gogoproto.moretags) = "yaml:\"to_address\""];

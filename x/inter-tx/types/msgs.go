@@ -3,7 +3,6 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
 )
 
 const (
@@ -15,14 +14,12 @@ var _ sdk.Msg = &MsgRegisterAccount{}
 
 // NewMsgRegisterAccount creates a new MsgRegisterAccount instance
 func NewMsgRegisterAccount(
-	port, channel string, height clienttypes.Height, timestamp uint64, owner string,
+	port, channel string, owner string,
 ) *MsgRegisterAccount {
 	return &MsgRegisterAccount{
-		SourcePort:       port,
-		SourceChannel:    channel,
-		TimeoutHeight:    height,
-		TimeoutTimestamp: timestamp,
-		Owner:            owner,
+		SourcePort:    port,
+		SourceChannel: channel,
+		Owner:         owner,
 	}
 }
 
@@ -61,17 +58,15 @@ var _ sdk.Msg = &MsgSend{}
 
 // NewMsgSend creates a new MsgSend instance
 func NewMsgSend(
-	chainType, port, channel string, height clienttypes.Height, timestamp uint64, sender, toAddress string, amount []sdk.Coin,
+	chainType, port, channel string, sender, toAddress string, amount []sdk.Coin,
 ) *MsgSend {
 	return &MsgSend{
-		ChainType:        chainType,
-		SourcePort:       port,
-		SourceChannel:    channel,
-		TimeoutHeight:    height,
-		TimeoutTimestamp: timestamp,
-		Sender:           sender,
-		ToAddress:        toAddress,
-		Amount:           amount,
+		ChainType:     chainType,
+		SourcePort:    port,
+		SourceChannel: channel,
+		Sender:        sender,
+		ToAddress:     toAddress,
+		Amount:        amount,
 	}
 }
 

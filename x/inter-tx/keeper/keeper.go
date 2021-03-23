@@ -4,7 +4,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
 	ibcacckeeper "github.com/interchainberlin/ica/x/ibc-account/keeper"
 )
 
@@ -32,8 +31,6 @@ func (keeper Keeper) TrySendCoins(ctx sdk.Context,
 	fromAddr sdk.AccAddress,
 	toAddr sdk.AccAddress,
 	amt sdk.Coins,
-	timeoutHeight clienttypes.Height,
-	timeoutTimestamp uint64,
 ) error {
 	ibcAccount, err := keeper.GetIBCAccount(ctx, sourcePort, sourceChannel, fromAddr)
 	if err != nil {
@@ -42,6 +39,6 @@ func (keeper Keeper) TrySendCoins(ctx sdk.Context,
 
 	msg := banktypes.NewMsgSend(ibcAccount.Address, toAddr, amt)
 
-	_, err = keeper.iaKeeper.TryRunTx(ctx, sourcePort, sourceChannel, typ, msg, timeoutHeight, timeoutTimestamp)
+	_, err = keeper.iaKeeper.TryRunTx(ctx, sourcePort, sourceChannel, typ, msg)
 	return err
 }

@@ -38,8 +38,6 @@ func (k msgServer) Register(
 		acc,
 		msg.SourcePort,
 		msg.SourceChannel,
-		msg.TimeoutHeight,
-		msg.TimeoutTimestamp,
 	)
 	if err != nil {
 		return &types.MsgRegisterAccountResponse{}, err
@@ -59,7 +57,7 @@ func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSe
 		return &types.MsgSendResponse{}, err
 	}
 
-	err = k.TrySendCoins(ctx, msg.SourcePort, msg.SourceChannel, msg.ChainType, acc, acc2, msg.Amount, msg.TimeoutHeight, msg.TimeoutTimestamp)
+	err = k.TrySendCoins(ctx, msg.SourcePort, msg.SourceChannel, msg.ChainType, acc, acc2, msg.Amount)
 	if err != nil {
 		return nil, err
 	}

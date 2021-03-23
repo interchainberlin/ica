@@ -2,7 +2,6 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
 	"github.com/interchainberlin/ica/x/inter-tx/types"
 )
 
@@ -11,11 +10,9 @@ func (keeper Keeper) RegisterIBCAccount(
 	sender sdk.AccAddress,
 	sourcePort,
 	sourceChannel string,
-	timeoutHeight clienttypes.Height,
-	timeoutTimestamp uint64,
 ) error {
 	salt := keeper.GetIncrementalSalt(ctx)
-	err := keeper.iaKeeper.TryRegisterIBCAccount(ctx, sourcePort, sourceChannel, []byte(salt), timeoutHeight, timeoutTimestamp)
+	err := keeper.iaKeeper.TryRegisterIBCAccount(ctx, sourcePort, sourceChannel, []byte(salt))
 	if err != nil {
 		return err
 	}
