@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -31,9 +30,6 @@ func (k Keeper) registerIBCAccount(ctx sdk.Context, sourcePort, sourceChannel, d
 	)
 	k.accountKeeper.NewAccount(ctx, ibcAccount)
 	k.accountKeeper.SetAccount(ctx, ibcAccount)
-	acc := k.accountKeeper.GetAccount(ctx, address)
-	testStr := acc.GetAddress().String()
-	fmt.Print(testStr)
 	return ibcAccount, nil
 }
 

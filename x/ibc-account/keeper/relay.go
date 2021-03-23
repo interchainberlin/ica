@@ -40,10 +40,12 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 		Data: salt,
 	}
 
-	height := clienttypes.Height{
+	timeoutHeight := clienttypes.Height{
 		RevisionNumber: 2,
-		RevisionHeight: 1916502603380168555,
+		RevisionHeight: ^uint64(0),
 	}
+
+	const timeoutTimestamp = ^uint64(0)
 
 	packet := channeltypes.NewPacket(
 		packetData.GetBytes(),
@@ -52,8 +54,8 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 		sourceChannel,
 		destinationPort,
 		destinationChannel,
-		height,
-		^uint64(0),
+		timeoutHeight,
+		timeoutTimestamp,
 	)
 
 	if err := k.channelKeeper.SendPacket(ctx, channelCap, packet); err != nil {
@@ -127,10 +129,12 @@ func (k Keeper) createOutgoingPacket(
 		Data: txBytes,
 	}
 
-	height := clienttypes.Height{
+	timeoutHeight := clienttypes.Height{
 		RevisionNumber: 2,
 		RevisionHeight: 1916502603380168555,
 	}
+
+	const timeoutTimestamp = ^uint64(0)
 
 	packet := channeltypes.NewPacket(
 		packetData.GetBytes(),
@@ -139,8 +143,8 @@ func (k Keeper) createOutgoingPacket(
 		sourceChannel,
 		destinationPort,
 		destinationChannel,
-		height,
-		^uint64(0),
+		timeoutHeight,
+		timeoutTimestamp,
 	)
 
 	return k.ComputeVirtualTxHash(packetData.Data, packet.Sequence), k.channelKeeper.SendPacket(ctx, channelCap, packet)
