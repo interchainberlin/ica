@@ -41,12 +41,12 @@ func (k Keeper) GenerateAddress(identifier string, salt []byte) []byte {
 func (k Keeper) GetIBCAccount(ctx sdk.Context, addr sdk.AccAddress) (types.IBCAccount, error) {
 	acc := k.accountKeeper.GetAccount(ctx, addr)
 	if acc == nil {
-		return types.IBCAccount{}, sdkerrors.Wrap(types.ErrIBCAccountNotFound, "their is no account")
+		return types.IBCAccount{}, sdkerrors.Wrap(types.ErrIBCAccountNotFound, "there is no account")
 	}
 
 	ibcAcc, ok := acc.(*types.IBCAccount)
 	if !ok {
-		return types.IBCAccount{}, sdkerrors.Wrap(types.ErrIBCAccountNotFound, "account is not IBC account")
+		return types.IBCAccount{}, sdkerrors.Wrap(types.ErrIBCAccountNotFound, "account is not an IBC account")
 	}
 	return *ibcAcc, nil
 }
