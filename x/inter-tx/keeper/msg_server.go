@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/interchainberlin/ica/x/inter-tx/types"
 )
 
@@ -30,7 +31,8 @@ func (k msgServer) Register(
 	// check if an account is already registered
 	_, err = k.GetIBCAccount(ctx, msg.SourcePort, msg.SourceChannel, acc)
 	if err == nil {
-		return &types.MsgRegisterAccountResponse{}, fmt.Errorf("Interchain account is already registered for this account")
+		err = fmt.Errorf("Interchain account is already registered for this account")
+		return &types.MsgRegisterAccountResponse{}, sdkerrors.Wrap(err, err.Error())
 	}
 
 	err = k.RegisterIBCAccount(
