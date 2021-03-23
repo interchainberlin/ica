@@ -3,14 +3,13 @@ package cli
 import (
 	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/interchainberlin/ica/x/inter-tx/types"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -30,29 +29,28 @@ func GetTxCmd() *cobra.Command {
 
 	// this line is used by starport scaffolding # 1
 	cmd.AddCommand(
-		GetRegisterAccountCmd(),
-		GetSendTxCmd(),
+		getRegisterAccountCmd(),
+		getSendTxCmd(),
 	)
 
 	return cmd
 }
 
-func GetRegisterAccountCmd() *cobra.Command {
+func getRegisterAccountCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "register [src-port] [src-channel]",
-		Args: cobra.ExactArgs(2),
+		Use: "register",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			srcPort := args[0]
-			srcChannel := args[1]
+			sourcePort := viper.GetString(FlagSourcePort)
+			sourceChannel := viper.GetString(FlagSourceChannel)
 
 			msg := types.NewMsgRegisterAccount(
-				srcPort,
-				srcChannel,
+				sourcePort,
+				sourceChannel,
 				clientCtx.GetFromAddress().String(),
 			)
 
@@ -63,16 +61,20 @@ func GetRegisterAccountCmd() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
+	cmd.Flags().AddFlagSet(fsSourcePort)
+	cmd.Flags().AddFlagSet(fsSourceChannel)
 
+	_ = cmd.MarkFlagRequired(FlagSourcePort)
+	_ = cmd.MarkFlagRequired(FlagSourceChannel)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
 
-func GetSendTxCmd() *cobra.Command {
+func getSendTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "send [type] [to_address] [from_address] [amount] [source_port], [source_channel]",
-		Args: cobra.ExactArgs(6),
+		Use:  "send [type] [to_address] [amount]",
+		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -80,19 +82,24 @@ func GetSendTxCmd() *cobra.Command {
 			}
 
 			chainType := args[0]
-			toAddress := args[1]
-			fromAddress := args[2]
-			amount, err := sdk.ParseCoinsNormalized(args[3])
+			fromAddress := clientCtx.GetFromAddress()
+			toAddress, err := sdk.AccAddressFromBech32(args[1])
 			if err != nil {
 				return err
 			}
-			srcPort := args[4]
-			srcChannel := args[5]
+
+			amount, err := sdk.ParseCoinsNormalized(args[2])
+			if err != nil {
+				return err
+			}
+
+			sourcePort := viper.GetString(FlagSourcePort)
+			sourceChannel := viper.GetString(FlagSourceChannel)
 
 			msg := types.NewMsgSend(
 				chainType,
-				srcPort,
-				srcChannel,
+				sourcePort,
+				sourceChannel,
 				fromAddress,
 				toAddress,
 				amount,
@@ -104,10 +111,12 @@ func GetSendTxCmd() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
+	cmd.Flags().AddFlagSet(fsSourcePort)
+	cmd.Flags().AddFlagSet(fsSourceChannel)
 
-	cmd.Flags().String(flagPacketTimeoutHeight, "0-1000", "Packet timeout block height. The timeout is disabled when set to 0-0.")
-	cmd.Flags().Uint64(flagPacketTimeoutTimestamp, uint64((time.Duration(10) * time.Minute).Nanoseconds()), "Packet timeout timestamp in nanoseconds. Default is 10 minutes. The timeout is disabled when set to 0.")
-	cmd.Flags().Bool(flagAbsoluteTimeouts, false, "Timeout flags are used as absolute timeouts.")
+	_ = cmd.MarkFlagRequired(FlagSourcePort)
+	_ = cmd.MarkFlagRequired(FlagSourceChannel)
+
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

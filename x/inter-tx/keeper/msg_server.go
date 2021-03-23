@@ -48,16 +48,7 @@ func (k msgServer) Register(
 
 func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	acc, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		return &types.MsgSendResponse{}, err
-	}
-	acc2, err := sdk.AccAddressFromBech32(msg.ToAddress)
-	if err != nil {
-		return &types.MsgSendResponse{}, err
-	}
-
-	err = k.TrySendCoins(ctx, msg.SourcePort, msg.SourceChannel, msg.ChainType, acc, acc2, msg.Amount)
+	err := k.TrySendCoins(ctx, msg.SourcePort, msg.SourceChannel, msg.ChainType, msg.Sender, msg.ToAddress, msg.Amount)
 	if err != nil {
 		return nil, err
 	}

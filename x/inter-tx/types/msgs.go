@@ -58,7 +58,7 @@ var _ sdk.Msg = &MsgSend{}
 
 // NewMsgSend creates a new MsgSend instance
 func NewMsgSend(
-	chainType, port, channel string, sender, toAddress string, amount []sdk.Coin,
+	chainType, port, channel string, sender, toAddress sdk.AccAddress, amount []sdk.Coin,
 ) *MsgSend {
 	return &MsgSend{
 		ChainType:     chainType,
@@ -82,20 +82,16 @@ func (MsgSend) Type() string {
 
 // GetSigners implements sdk.Msg
 func (msg MsgSend) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{accAddr}
+	return []sdk.AccAddress{msg.Sender}
 }
 
 // ValidateBasic performs a basic check of the MsgRegisterAccount fields.
 func (msg MsgSend) ValidateBasic() error {
-	if msg.Sender == "" {
+	if msg.Sender.String() == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing sender address")
 	}
 
-	if msg.ToAddress == "" {
+	if msg.ToAddress.String() == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing recipient address")
 	}
 

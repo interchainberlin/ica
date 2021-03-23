@@ -43,8 +43,8 @@ message MsgSend {
   // the channel by which the packet will be sent
   string source_channel = 3 [(gogoproto.moretags) = "yaml:\"source_channel\""];
 
-  string   sender                    = 6 [(gogoproto.moretags) = "yaml:\"from_address\""];
-  string   to_address                      = 7 [(gogoproto.moretags) = "yaml:\"to_address\""];
+  bytes   sender                    = 6 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+  bytes   to_address                      = 7 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   repeated cosmos.base.v1beta1.Coin amount = 8
       [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 }
