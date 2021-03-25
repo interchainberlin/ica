@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"strings"
 )
 
 const (
@@ -34,7 +35,7 @@ func (MsgRegisterAccount) Type() string {
 }
 
 func (msg MsgRegisterAccount) ValidateBasic() error {
-	if msg.Owner == "" {
+	if strings.TrimSpace(msg.Owner) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing sender address")
 	}
 
@@ -58,7 +59,7 @@ var _ sdk.Msg = &MsgSend{}
 
 // NewMsgSend creates a new MsgSend instance
 func NewMsgSend(
-	chainType, port, channel string, sender, toAddress sdk.AccAddress, amount []sdk.Coin,
+	chainType, port, channel string, sender, toAddress sdk.AccAddress, amount sdk.Coins,
 ) *MsgSend {
 	return &MsgSend{
 		ChainType:     chainType,
@@ -87,19 +88,15 @@ func (msg MsgSend) GetSigners() []sdk.AccAddress {
 
 // ValidateBasic performs a basic check of the MsgRegisterAccount fields.
 func (msg MsgSend) ValidateBasic() error {
-	if msg.Sender.String() == "" {
+	if strings.TrimSpace(msg.Sender.String()) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing sender address")
 	}
 
-	if msg.ToAddress.String() == "" {
+	if strings.TrimSpace(msg.ToAddress.String()) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing recipient address")
 	}
 
 	if !msg.Amount.IsValid() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
-	}
-
-	if !msg.Amount.IsAllPositive() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
 	}
 	return nil

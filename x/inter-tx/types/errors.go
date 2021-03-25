@@ -5,6 +5,6 @@ import (
 )
 
 var (
-	ErrIAAccountAlreadyExist = sdkerrors.Register(ModuleName, 2, "interchain account already registered")
-	ErrIAAccountNotExist     = sdkerrors.Register(ModuleName, 3, "interchain account not exist")
+	ErrIBCAccountAlreadyExist = sdkerrors.Register(ModuleName, 2, "interchain account already registered")
+	ErrIBCAccountNotExist     = sdkerrors.Register(ModuleName, 3, "interchain account not exist")
 )

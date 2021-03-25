@@ -33,7 +33,7 @@ func (keeper Keeper) GetIBCAccount(ctx sdk.Context, sourcePort, sourceChannel st
 
 	key := types.KeyRegisteredAccount(sourcePort, sourceChannel, address)
 	if !store.Has(key) {
-		return types.QueryIBCAccountFromAddressResponse{}, types.ErrIAAccountNotExist
+		return types.QueryIBCAccountFromAddressResponse{}, types.ErrIBCAccountNotExist
 	}
 	res := types.QueryIBCAccountFromAddressResponse{}
 	addr := store.Get(key)

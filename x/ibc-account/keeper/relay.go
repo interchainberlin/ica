@@ -40,11 +40,10 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 		Data: salt,
 	}
 
-	timeoutHeight := clienttypes.Height{
-		RevisionNumber: 2,
-		RevisionHeight: ^uint64(0),
-	}
+	timeoutHeight := clienttypes.ZeroHeight()
 
+	// timeoutTimestamp is set to be a max number here so that we never recieve a timeout
+	// ics-27-1 uses ordered channels which can close upon recieving a timeout, which is an undesired effect
 	const timeoutTimestamp = ^uint64(0)
 
 	packet := channeltypes.NewPacket(
@@ -65,7 +64,7 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 	return nil
 }
 
-// TryRunTx try to send messages to source channel.
+// TryRunTx attemps to send messages to source channel.
 func (k Keeper) TryRunTx(ctx sdk.Context, sourcePort, sourceChannel, typ string, data interface{}) ([]byte, error) {
 	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)
 	if !found {
@@ -129,11 +128,10 @@ func (k Keeper) createOutgoingPacket(
 		Data: txBytes,
 	}
 
-	timeoutHeight := clienttypes.Height{
-		RevisionNumber: 2,
-		RevisionHeight: ^uint64(0),
-	}
+	timeoutHeight := clienttypes.ZeroHeight()
 
+	// timeoutTimestamp is set to be a max number here so that we never recieve a timeout
+	// ics-27-1 uses ordered channels which can close upon recieving a timeout, which is an undesired effect
 	const timeoutTimestamp = ^uint64(0)
 
 	packet := channeltypes.NewPacket(
