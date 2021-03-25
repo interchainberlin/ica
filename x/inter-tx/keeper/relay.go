@@ -5,6 +5,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
+// TrySendCoins builds a banktypes.NewMsgSend and uses the ibc-account module keeper to send the message to another chain
 func (keeper Keeper) TrySendCoins(ctx sdk.Context,
 	sourcePort,
 	sourceChannel string,

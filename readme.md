@@ -7,7 +7,7 @@ This repo contains an ongoing refactor/update of https://github.com/chainapsis/c
 
 ```bash
 # Clone this repository and build
-git clone https://github.com/interchainberlin/ica.git
+git clone git@github.com:cosmos/interchain-account.git 
 cd ica
 make install 
 
@@ -18,6 +18,8 @@ make install
 
 # Bootstrap two local chains & start the relayer with development data
 make init
+
+# Wait for the ibc connection & channel handshake to complete and the relayer to start
 ```
 
 ### Send Asset Demo
@@ -41,8 +43,10 @@ icad q bank balances $IBC_ACCOUNT --chain-id test-2
 
 # Send some assets to $IBC_ACCOUNT.
 icad tx bank send val2 $IBC_ACCOUNT 1000stake --chain-id test-2 --home ./data/test-2 --node tcp://localhost:26657
+# Check that the balance has been updated
+icad q bank balances $IBC_ACCOUNT --chain-id test-2
 
-# Test sending assets on intetchain account via ibc.
+# Test sending assets from interchain account via ibc.
 icad tx intertx send cosmos-sdk $VAL_2 500stake --source-port ibcaccount --source-channel channel-0 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 --from val1
 
 # Wait until the relayer has relayed the packet

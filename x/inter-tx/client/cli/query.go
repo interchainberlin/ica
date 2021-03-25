@@ -18,12 +18,13 @@ func GetQueryCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(GetIBCAccountCmd())
+	cmd.AddCommand(getIBCAccountCmd())
 
 	return cmd
 }
 
-func GetIBCAccountCmd() *cobra.Command {
+// getIBCAccountCmd builds a cobra command to query for an interchain account registered on this chain
+func getIBCAccountCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "ibcaccount [account] [source-port] [source-channel]",
 		Args: cobra.ExactArgs(3),

@@ -5,7 +5,8 @@ import (
 	"github.com/interchainberlin/ica/x/inter-tx/types"
 )
 
-func (keeper Keeper) pushAddressToRegistrationQueue(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) {
+// PushAddressToRegistrationQueue pushes an address to a FIFO queue
+func (keeper Keeper) PushAddressToRegistrationQueue(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) {
 	store := ctx.KVStore(keeper.storeKey)
 
 	queue := types.RegistrationQueue{
@@ -24,9 +25,9 @@ func (keeper Keeper) pushAddressToRegistrationQueue(ctx sdk.Context, sourcePort,
 	store.Set(types.KeyRegistrationQueue(sourcePort, sourceChannel), bz)
 }
 
-// Pop address from registration queue.
+// PopAddressFromRegistrationQueue pops an address from the registration queue.
 // If queue is empty, it returns []bytes{}.
-func (keeper Keeper) popAddressFromRegistrationQueue(ctx sdk.Context, sourcePort, sourceChannel string) sdk.AccAddress {
+func (keeper Keeper) PopAddressFromRegistrationQueue(ctx sdk.Context, sourcePort, sourceChannel string) sdk.AccAddress {
 	store := ctx.KVStore(keeper.storeKey)
 
 	queue := types.RegistrationQueue{

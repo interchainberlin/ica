@@ -15,7 +15,7 @@ service Msg {
   rpc Send(MsgSend) returns (MsgSendResponse);
 }
 
-// MsgSend defines a SDK message for creating a new identifer.
+//MsgRegisterAccount is used to register an interchain account on a target chain 
 message MsgRegisterAccount {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
@@ -31,7 +31,7 @@ message MsgRegisterAccount {
 
 message MsgRegisterAccountResponse {}
 
-// MsgSend represents a message to send coins from one account to another.
+// MsgSend is used to send coins from an interchain account to another account on the same chain
 message MsgSend {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;

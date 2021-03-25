@@ -5,6 +5,8 @@ import (
 	"github.com/interchainberlin/ica/x/inter-tx/types"
 )
 
+// RegisterIBCAccount uses the ibc-account module keeper to register an account on a target chain
+// An address registration queue is used to keep track of registration requests
 func (keeper Keeper) RegisterIBCAccount(
 	ctx sdk.Context,
 	sender sdk.AccAddress,
@@ -17,7 +19,7 @@ func (keeper Keeper) RegisterIBCAccount(
 		return err
 	}
 
-	keeper.pushAddressToRegistrationQueue(ctx, sourcePort, sourceChannel, sender)
+	keeper.PushAddressToRegistrationQueue(ctx, sourcePort, sourceChannel, sender)
 
 	ctx.EventManager().EmitEvent(sdk.NewEvent("register-interchain-account",
 		sdk.NewAttribute("salt", salt)))
@@ -25,6 +27,7 @@ func (keeper Keeper) RegisterIBCAccount(
 	return nil
 }
 
+// GetIBCAccount returns an interchain account address
 func (keeper Keeper) GetIBCAccount(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) (types.QueryIBCAccountFromAddressResponse, error) {
 	store := ctx.KVStore(keeper.storeKey)
 
@@ -40,6 +43,7 @@ func (keeper Keeper) GetIBCAccount(ctx sdk.Context, sourcePort, sourceChannel st
 	return res, nil
 }
 
+// GetIncrementalSalt increments the Salt value by 1 and returns the Salt
 func (keeper Keeper) GetIncrementalSalt(ctx sdk.Context) string {
 	kvStore := ctx.KVStore(keeper.storeKey)
 
