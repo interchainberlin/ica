@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/interchainberlin/ica/x/ibc-account/types"
+	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 )
 
 var _ types.QueryServer = Keeper{}

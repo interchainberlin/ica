@@ -79,16 +79,17 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	appparams "github.com/interchainberlin/ica/app/params"
-	ibcaccount "github.com/interchainberlin/ica/x/ibc-account"
-	ibcaccountkeeper "github.com/interchainberlin/ica/x/ibc-account/keeper"
-	ibcaccounttypes "github.com/interchainberlin/ica/x/ibc-account/types"
+	appparams "github.com/cosmos/interchain-accounts/app/params"
+	ibcaccount "github.com/cosmos/interchain-accounts/x/ibc-account"
+	ibcaccountkeeper "github.com/cosmos/interchain-accounts/x/ibc-account/keeper"
+	ibcaccounttypes "github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
-	intertx "github.com/interchainberlin/ica/x/inter-tx"
-	intertxkeeper "github.com/interchainberlin/ica/x/inter-tx/keeper"
-	intertxtypes "github.com/interchainberlin/ica/x/inter-tx/types"
+	intertx "github.com/cosmos/interchain-accounts/x/inter-tx"
+	intertxkeeper "github.com/cosmos/interchain-accounts/x/inter-tx/keeper"
+	intertxtypes "github.com/cosmos/interchain-accounts/x/inter-tx/types"
 )
 
 const Name = "ica"

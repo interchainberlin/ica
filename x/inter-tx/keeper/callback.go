@@ -2,7 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/interchainberlin/ica/x/inter-tx/types"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 )
 
 // OnAccountCreated is a callback that is fired when an acknowledgement has been recieved from a target chain for registing an interchain account

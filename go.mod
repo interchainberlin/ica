@@ -1,4 +1,4 @@
-module github.com/interchainberlin/ica
+module github.com/cosmos/interchain-accounts
 
 go 1.15
 

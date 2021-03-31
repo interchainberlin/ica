@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/interchainberlin/ica/x/ibc-account/client/cli"
+	"github.com/cosmos/interchain-accounts/x/ibc-account/client/cli"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
@@ -21,9 +21,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
+	"github.com/cosmos/interchain-accounts/x/ibc-account/keeper"
+	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	"github.com/gorilla/mux"
-	"github.com/interchainberlin/ica/x/ibc-account/keeper"
-	"github.com/interchainberlin/ica/x/ibc-account/types"
 	"github.com/spf13/cobra"
 )
 

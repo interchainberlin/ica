@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 
-	"github.com/interchainberlin/ica/x/ibc-account/types"
+	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 )
 
 func GetQueryCmd() *cobra.Command {

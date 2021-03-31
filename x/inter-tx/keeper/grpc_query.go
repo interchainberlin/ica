@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/interchainberlin/ica/x/inter-tx/types"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 )
 
 // IBCAccountFromAddress implements the Query/IBCAccount gRPC method

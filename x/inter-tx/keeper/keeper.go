@@ -3,7 +3,7 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	ibcacckeeper "github.com/interchainberlin/ica/x/ibc-account/keeper"
+	ibcacckeeper "github.com/cosmos/interchain-accounts/x/ibc-account/keeper"
 )
 
 type Keeper struct {

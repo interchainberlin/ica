@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 
 import "cosmos/auth/v1beta1/auth.proto";
 
-option go_package = "github.com/interchainberlin/ica/x/ibc-account/types";
+option go_package = "github.com/cosmos/interchain-accounts/x/ibc-account/types";
 
 // IBCAccount defines an account to which other chains have privileges
 message IBCAccount {

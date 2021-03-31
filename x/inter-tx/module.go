@@ -17,9 +17,9 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/interchainberlin/ica/x/inter-tx/client/cli"
-	"github.com/interchainberlin/ica/x/inter-tx/keeper"
-	"github.com/interchainberlin/ica/x/inter-tx/types"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/client/cli"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/keeper"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 )
 
 var (

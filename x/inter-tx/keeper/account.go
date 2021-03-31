@@ -2,7 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/interchainberlin/ica/x/inter-tx/types"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 )
 
 // RegisterIBCAccount uses the ibc-account module keeper to register an account on a target chain

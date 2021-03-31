@@ -4,8 +4,8 @@ import (
 	"os"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/interchainberlin/ica/app"
-	"github.com/interchainberlin/ica/cmd/icad/cmd"
+	"github.com/cosmos/interchain-accounts/app"
+	"github.com/cosmos/interchain-accounts/cmd/icad/cmd"
 )
 
 func main() {

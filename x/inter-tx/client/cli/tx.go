@@ -2,12 +2,13 @@ package cli
 
 import (
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/interchainberlin/ica/x/inter-tx/types"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

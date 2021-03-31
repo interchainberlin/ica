@@ -3,8 +3,8 @@ package inter_tx
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/interchainberlin/ica/x/inter-tx/keeper"
-	"github.com/interchainberlin/ica/x/inter-tx/types"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/keeper"
+	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {
