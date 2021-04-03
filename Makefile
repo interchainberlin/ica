@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-PACKAGES=$(shell go list ./...)
+PACKAGES=$(shell go list ./... | grep -v 'testing\|chains' )
 DOCKER := $(shell which docker)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 
@@ -19,6 +19,9 @@ go.sum: go.mod
 
 test:
 	@go test -mod=readonly $(PACKAGES) -cover
+
+test-coverage:
+	go test $(PACKAGES) -coverprofile=coverage.out && go tool cover -func=coverage.out
 
 lint:
 	@echo "--> Running linter"
