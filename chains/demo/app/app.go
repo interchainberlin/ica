@@ -79,7 +79,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	appparams "github.com/cosmos/interchain-accounts/app/params"
+	appparams "github.com/cosmos/interchain-accounts/chains/demo/app/params"
 	ibcaccount "github.com/cosmos/interchain-accounts/x/ibc-account"
 	ibcaccountkeeper "github.com/cosmos/interchain-accounts/x/ibc-account/keeper"
 	ibcaccounttypes "github.com/cosmos/interchain-accounts/x/ibc-account/types"

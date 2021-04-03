@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/cosmos/interchain-accounts/app/params"
+	"github.com/cosmos/interchain-accounts/chains/demo/app/params"
 
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
@@ -33,7 +33,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/cosmos/interchain-accounts/app"
+	"github.com/cosmos/interchain-accounts/chains/demo/app"
 	// this line is used by starport scaffolding # stargate/root/import
 )
 

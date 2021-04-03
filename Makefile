@@ -8,10 +8,10 @@ DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bu
 ###############################################################################
 install: go.sum
 		@echo "--> Installing icad"
-		@go install ./cmd/icad
+		@go install ./chains/demo/cmd/icad
 
 install-debug: go.sum
-	go build -gcflags="all=-N -l" ./cmd/icad
+	go build -gcflags="all=-N -l" ./chains/demo/cmd/icad
 
 go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"
