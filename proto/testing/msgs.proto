@@ -1,0 +1,49 @@
+syntax = "proto3";
+package testing;
+
+option go_package = "github.com/cosmos/interchain-accounts/x/ibc-account/mocks/mock-inter-tx/types";
+
+import "gogoproto/gogo.proto";
+import "ibc/core/client/v1/client.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+message MsgTryRegisterIBCAccount {
+    // the port on which the packet will be sent
+    string source_port = 1 [(gogoproto.moretags) = "yaml:\"source_port\""];
+    // the channel by which the packet will be sent
+    string source_channel = 2 [(gogoproto.moretags) = "yaml:\"source_channel\""];
+    // the salt that will be transfered to counterparty chain.
+    bytes salt = 3 [(gogoproto.moretags) = "yaml:\"source_channel\""];
+    // Timeout height relative to the current block height.
+    // The timeout is disabled when set to 0.
+    ibc.core.client.v1.Height timeout_height = 4 [(gogoproto.moretags) = "yaml:\"timeout_height\"", (gogoproto.nullable) = false];
+    // Timeout timestamp (in nanoseconds) relative to the current block timestamp.
+    // The timeout is disabled when set to 0.
+    uint64 timeout_timestamp = 5 [(gogoproto.moretags) = "yaml:\"timeout_timestamp\""];
+    bytes sender = 6 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}
+
+message MsgTryRunTxMsgSend {
+    // the port on which the packet will be sent
+    string source_port = 1 [(gogoproto.moretags) = "yaml:\"source_port\""];
+    // the channel by which the packet will be sent
+    string source_channel = 2 [(gogoproto.moretags) = "yaml:\"source_channel\""];
+    // Timeout height relative to the current block height.
+    // The timeout is disabled when set to 0.
+    ibc.core.client.v1.Height timeout_height = 4 [(gogoproto.moretags) = "yaml:\"timeout_height\"", (gogoproto.nullable) = false];
+    // Timeout timestamp (in nanoseconds) relative to the current block timestamp.
+    // The timeout is disabled when set to 0.
+    uint64 timeout_timestamp = 5 [(gogoproto.moretags) = "yaml:\"timeout_timestamp\""];
+    bytes from_address = 6 [
+        (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",
+        (gogoproto.moretags) = "yaml:\"from_address\""
+    ];
+    bytes to_address = 7 [
+        (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",
+        (gogoproto.moretags) = "yaml:\"to_address\""
+    ];
+    repeated cosmos.base.v1beta1.Coin amount = 8
+        [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+
+    bytes sender = 9 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+}

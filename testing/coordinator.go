@@ -52,7 +52,7 @@ func (coord *Coordinator) Setup(
 	clientA, clientB, connA, connB := coord.SetupClientConnections(chainA, chainB, exported.Tendermint)
 
 	// channels can also be referenced through the returned connections
-	channelA, channelB := coord.CreateMockChannels(chainA, chainB, connA, connB, order)
+	channelA, channelB := coord.CreateIBCAccountChannels(chainA, chainB, connA, connB, order)
 
 	return clientA, clientB, connA, connB, channelA, channelB
 }
@@ -184,6 +184,17 @@ func (coord *Coordinator) CreateTransferChannels(
 	order channeltypes.Order,
 ) (TestChannel, TestChannel) {
 	return coord.CreateChannel(chainA, chainB, connA, connB, TransferPort, TransferPort, order)
+}
+
+// CreateTransferChannels constructs and executes channel handshake messages to create OPEN
+// ibc-transfer channels on chainA and chainB. The function expects the channels to be
+// successfully opened otherwise testing will fail.
+func (coord *Coordinator) CreateIBCAccountChannels(
+	chainA, chainB *TestChain,
+	connA, connB *TestConnection,
+	order channeltypes.Order,
+) (TestChannel, TestChannel) {
+	return coord.CreateChannel(chainA, chainB, connA, connB, IBCAccountPort, IBCAccountPort, order)
 }
 
 // CreateChannel constructs and executes channel handshake messages in order to create

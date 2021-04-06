@@ -46,14 +46,16 @@ const (
 	MaxClockDrift      time.Duration = time.Second * 10
 	DefaultDelayPeriod uint64        = 0
 
-	DefaultChannelVersion = ibctransfertypes.Version
+	DefaultChannelVersion = "ics27-1"
 	InvalidID             = "IDisInvalid"
 
 	ConnectionIDPrefix = "conn"
 	ChannelIDPrefix    = "chan"
 
-	TransferPort = ibctransfertypes.ModuleName
-	MockPort     = mock.ModuleName
+	TransferPort   = ibctransfertypes.ModuleName
+	IBCAccountPort = "ibcaccount"
+
+	MockPort = mock.ModuleName
 
 	// used for testing UpdateClientProposal
 	Title       = "title"
