@@ -14,6 +14,8 @@ make install
 # Clone relayer and build
 https://github.com/cosmos/relayer.git
 cd relayer
+// The demo is using this version of the golang relayer. Future versions will use the hermes relayer.
+git checkout 13245f1fee57e1754f3bf76fd89b153244e01ba4
 make install
 
 # Bootstrap two local chains & start the relayer with development data
