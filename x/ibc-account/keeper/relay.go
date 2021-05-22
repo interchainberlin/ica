@@ -42,7 +42,7 @@ func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel
 
 	// timeoutTimestamp is set to be a max number here so that we never recieve a timeout
 	// ics-27-1 uses ordered channels which can close upon recieving a timeout, which is an undesired effect
-	const timeoutTimestamp = ^uint64(0)
+	const timeoutTimestamp = ^uint64(0) >> 1 // Shift the unsigned bit to satisfy hermes relayer timestamp conversion
 
 	packet := channeltypes.NewPacket(
 		packetData.GetBytes(),
@@ -128,7 +128,7 @@ func (k Keeper) createOutgoingPacket(
 
 	// timeoutTimestamp is set to be a max number here so that we never recieve a timeout
 	// ics-27-1 uses ordered channels which can close upon recieving a timeout, which is an undesired effect
-	const timeoutTimestamp = ^uint64(0)
+	const timeoutTimestamp = ^uint64(0) >> 1 // Shift the unsigned bit to satisfy hermes relayer timestamp conversion
 
 	packet := channeltypes.NewPacket(
 		packetData.GetBytes(),
