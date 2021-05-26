@@ -43,17 +43,26 @@ proto-lint:
 init: kill-dev install 
 	@echo "Initializing both blockchains..."
 	./network/init.sh
+	./network/start.sh
 	@echo "Initializing relayer..." 
+	./network/hermes/hermes-restore-key.sh
+	./network/hermes/hermes.sh
+
+init-golang-rly: kill-dev install
+	@echo "Initializing both blockchains..."
+	./network/init.sh
+	./network/start.sh
+	@echo "Initializing relayer..."
 	./network/relayer/interchain-acc-config/rly.sh
 
 start: 
 	@echo "Starting up test network"
-	./network/init.sh
+	./network/start.sh
 
 start-rly:
-	./network/relayer/interchain-acc-config/rly.sh
+	./network/hermes/start.sh
 
 kill-dev:
 	@echo "Killing icad and removing previous data"
-	rm -rf ./data
+	-@rm -rf ./data
 	-@killall icad 2>/dev/null

@@ -74,13 +74,3 @@ sed -i -e 's/index_all_keys = false/index_all_keys = true/g' $CHAIN_DIR/$CHAINID
 sed -i -e 's/enable = false/enable = true/g' $CHAIN_DIR/$CHAINID_2/config/app.toml
 sed -i -e 's/swagger = false/swagger = true/g' $CHAIN_DIR/$CHAINID_2/config/app.toml
 sed -i -e 's#"tcp://0.0.0.0:1317"#"tcp://0.0.0.0:'"$RESTPORT_2"'"#g' $CHAIN_DIR/$CHAINID_2/config/app.toml
-
-echo "Starting $CHAINID_1 in $CHAIN_DIR..."
-echo "Creating log file at $CHAIN_DIR/$CHAINID_1.log"
-$BINARY start --home $CHAIN_DIR/$CHAINID_1 --pruning=nothing --grpc.address="0.0.0.0:$GRPCPORT_1" > $CHAIN_DIR/$CHAINID_1.log 2>&1 &
-
-echo "Starting $CHAINID_2 in $CHAIN_DIR..."
-echo "Creating log file at $CHAIN_DIR/$CHAINID_2.log"
-$BINARY start --home $CHAIN_DIR/$CHAINID_2 --pruning=nothing --grpc.address="0.0.0.0:$GRPCPORT_2" > $CHAIN_DIR/$CHAINID_2.log 2>&1 &
-
-
