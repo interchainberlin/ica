@@ -11,12 +11,11 @@ git clone git@github.com:cosmos/interchain-account.git
 cd ica
 make install 
 
-# Clone relayer and build
-https://github.com/cosmos/relayer.git
-cd relayer
-// The demo is using this version of the golang relayer. Future versions will use the hermes relayer.
-git checkout 13245f1fee57e1754f3bf76fd89b153244e01ba4
-make install
+# Hermes Relayer
+[Hermes](https://hermes.informal.systems/) is a Rust implementation of a relayer for the [Inter-Blockchain Communication (IBC)](https://ibcprotocol.org/) protocol.
+
+- Install [Rust](https://www.rust-lang.org/tools/install)
+- Install [Hermes](https://hermes.informal.systems/installation.html)
 
 # Bootstrap two local chains & start the relayer with development data
 make init

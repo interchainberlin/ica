@@ -47,6 +47,7 @@ init: kill-dev install
 	@echo "Initializing relayer..." 
 	./network/hermes/hermes-restore-key.sh
 	./network/hermes/hermes.sh
+	./network/hermes/start.sh
 
 init-golang-rly: kill-dev install
 	@echo "Initializing both blockchains..."
