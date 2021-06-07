@@ -1,41 +1,41 @@
 [global]
-strategy = 'naive'
 log_level = 'info'
+strategy = 'all'
 
 [[chains]]
-id = 'test-1'
-rpc_addr = 'http://127.0.0.1:16657'
-grpc_addr = 'http://127.0.0.1:8090'
-websocket_addr = 'ws://127.0.0.1:16657/websocket'
-rpc_timeout = '10s'
 account_prefix = 'cosmos'
-key_name = 'testkey'
-store_prefix = 'ibc'
-gas = 3000000
-fee_denom = 'stake'
+clock_drift = '5s'
 fee_amount = 10
-clock_drift = '5s'
+fee_denom = 'stake'
+gas = 3000000
+grpc_addr = 'http://127.0.0.1:8090'
+id = 'test-1'
+key_name = 'testkey'
+rpc_addr = 'http://127.0.0.1:16657'
+rpc_timeout = '10s'
+store_prefix = 'ibc'
 trusting_period = '14days'
+websocket_addr = 'ws://127.0.0.1:16657/websocket'
 
 [chains.trust_threshold]
-numerator = '1'
 denominator = '3'
+numerator = '1'
 
 [[chains]]
-id = 'test-2'
-rpc_addr = 'http://127.0.0.1:26657'
-grpc_addr = 'http://127.0.0.1:9090'
-websocket_addr = 'ws://127.0.0.1:26657/websocket'
-rpc_timeout = '10s'
 account_prefix = 'cosmos'
-key_name = 'testkey'
-store_prefix = 'ibc'
-gas = 3000000
-fee_denom = 'stake'
-fee_amount = 1000
 clock_drift = '5s'
+fee_amount = 1000
+fee_denom = 'stake'
+gas = 3000000
+grpc_addr = 'http://127.0.0.1:9090'
+id = 'test-2'
+key_name = 'testkey'
+rpc_addr = 'http://127.0.0.1:26657'
+rpc_timeout = '10s'
+store_prefix = 'ibc'
 trusting_period = '14days'
+websocket_addr = 'ws://127.0.0.1:26657/websocket'
 
 [chains.trust_threshold]
-numerator = '1'
 denominator = '3'
+numerator = '1'
