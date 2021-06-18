@@ -25,6 +25,21 @@ func (k Keeper) RegisterIBCAccount(ctx sdk.Context, owner, connectionId, counter
 	order := channeltypes.Order(2)
 	_, _, err = k.channelKeeper.ChanOpenInit(ctx, order, []string{connectionId}, owner, cap, counterParty, "ics27-1")
 
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			channeltypes.EventTypeChannelOpenInit,
+			sdk.NewAttribute(channeltypes.AttributeKeyPortID, owner),
+			sdk.NewAttribute(channeltypes.AttributeKeyChannelID, "channel-1"),
+			sdk.NewAttribute(channeltypes.AttributeCounterpartyPortID, "ibcaccount"),
+			sdk.NewAttribute(channeltypes.AttributeCounterpartyChannelID, counterPartyChannelId),
+			sdk.NewAttribute(channeltypes.AttributeKeyConnectionID, connectionId),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, channeltypes.AttributeValueCategory),
+		),
+	})
+
 	return err
 }
 
