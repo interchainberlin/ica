@@ -21,7 +21,6 @@ func (k Keeper) OnChanOpenInit(
 	counterparty channeltypes.Counterparty,
 	version string,
 ) error {
-	// Require portID is the portID transfer module is bound to
 	boundPort := k.GetPort(ctx)
 	if boundPort != portID {
 		return sdkerrors.Wrapf(porttypes.ErrInvalidPort, "invalid port: %s, expected %s", portID, boundPort)

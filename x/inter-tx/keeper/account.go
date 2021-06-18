@@ -10,19 +10,15 @@ import (
 func (keeper Keeper) RegisterIBCAccount(
 	ctx sdk.Context,
 	sender sdk.AccAddress,
-	sourcePort,
-	sourceChannel string,
+	connectionId,
+	counterPartyChannelId string,
 ) error {
-	salt := keeper.GetIncrementalSalt(ctx)
-	err := keeper.iaKeeper.TryRegisterIBCAccount(ctx, sourcePort, sourceChannel, []byte(salt))
+	err := keeper.iaKeeper.RegisterIBCAccount(ctx, sender.String(), connectionId, counterPartyChannelId)
 	if err != nil {
 		return err
 	}
 
-	keeper.PushAddressToRegistrationQueue(ctx, sourcePort, sourceChannel, sender)
-
-	ctx.EventManager().EmitEvent(sdk.NewEvent("register-interchain-account",
-		sdk.NewAttribute("salt", salt)))
+	ctx.EventManager().EmitEvent(sdk.NewEvent("register-interchain-account"))
 
 	return nil
 }

@@ -29,17 +29,11 @@ func (k msgServer) Register(
 		return &types.MsgRegisterAccountResponse{}, err
 	}
 
-	// check if an account is already registered
-	_, err = k.GetIBCAccount(ctx, msg.SourcePort, msg.SourceChannel, acc)
-	if err == nil {
-		return &types.MsgRegisterAccountResponse{}, types.ErrIBCAccountAlreadyExist
-	}
-
 	err = k.RegisterIBCAccount(
 		ctx,
 		acc,
-		msg.SourcePort,
-		msg.SourceChannel,
+		msg.ConnectionId,
+		msg.CounterPartyChannelId,
 	)
 	if err != nil {
 		return &types.MsgRegisterAccountResponse{}, err

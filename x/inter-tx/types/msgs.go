@@ -1,9 +1,10 @@
 package types
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"strings"
 )
 
 const (
@@ -15,12 +16,12 @@ var _ sdk.Msg = &MsgRegisterAccount{}
 
 // NewMsgRegisterAccount creates a new MsgRegisterAccount instance
 func NewMsgRegisterAccount(
-	port, channel string, owner string,
+	connectionId, counterPartyChannelId, owner string,
 ) *MsgRegisterAccount {
 	return &MsgRegisterAccount{
-		SourcePort:    port,
-		SourceChannel: channel,
-		Owner:         owner,
+		ConnectionId:          connectionId,
+		CounterPartyChannelId: counterPartyChannelId,
+		Owner:                 owner,
 	}
 }
 

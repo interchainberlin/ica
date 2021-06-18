@@ -52,8 +52,7 @@ func (k Keeper) IBCAccountFromData(ctx context.Context, req *types.QueryIBCAccou
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	identifier := types.GetIdentifier(req.Port, req.Channel)
-	address := k.GenerateAddress(identifier, []byte(req.Data))
+	address := k.GenerateAddress("test")
 
 	ibcAccount, err := k.GetIBCAccount(sdkCtx, address)
 	if err != nil {

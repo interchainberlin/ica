@@ -3,39 +3,34 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
+	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
 	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-// RegisterIBCAccount performs registering IBC account.
-// It will generate the deterministic address by hashing {sourcePort}/{sourceChannel}/{salt}.
-func (k Keeper) registerIBCAccount(ctx sdk.Context, sourcePort, sourceChannel, destPort, destChannel string, salt []byte) (types.IBCAccountI, error) {
-	identifier := types.GetIdentifier(destPort, destChannel)
-	address := k.GenerateAddress(identifier, salt)
-
-	account := k.accountKeeper.GetAccount(ctx, address)
-	// TODO: Discuss the vulnerabilities when creating a new account only if the old account does not exist
-	// Attackers can interrupt creating accounts by sending some assets before the packet is delivered.
-	// So it is needed to check that the account is not created from users.
-	// Returns an error only if the account was created by other chain.
-	// We need to discuss how we can judge this case.
-	if account != nil {
-		return nil, sdkerrors.Wrap(types.ErrAccountAlreadyExist, account.String())
+// This function binds the port for the owner & opens a channel
+// TODO:
+// When an account is successfully registered you should set the active channel, do this in the onOpenTry
+func (k Keeper) RegisterIBCAccount(ctx sdk.Context, owner, connectionId, counterPartyChannelId string) error {
+	//TODO:
+	// If the port is already bound & the account was created successfully, then exit
+	cap := k.portKeeper.BindPort(ctx, owner)
+	err := k.ClaimCapability(ctx, cap, host.PortPath(owner))
+	if err != nil {
+		return err
 	}
 
-	ibcAccount := types.NewIBCAccount(
-		authtypes.NewBaseAccountWithAddress(address),
-		sourcePort, sourceChannel, destPort, destChannel,
-	)
-	k.accountKeeper.NewAccount(ctx, ibcAccount)
-	k.accountKeeper.SetAccount(ctx, ibcAccount)
-	return ibcAccount, nil
+	counterParty := channeltypes.Counterparty{PortId: "ibcaccount", ChannelId: counterPartyChannelId}
+	order := channeltypes.Order(2)
+	_, _, err = k.channelKeeper.ChanOpenInit(ctx, order, []string{connectionId}, owner, cap, counterParty, "ics27-1")
+
+	return err
 }
 
 // Determine account's address that will be created.
-func (k Keeper) GenerateAddress(identifier string, salt []byte) []byte {
-	return tmhash.SumTruncated(append([]byte(identifier), salt...))
+func (k Keeper) GenerateAddress(identifier string) []byte {
+	return tmhash.SumTruncated(append([]byte(identifier)))
 }
 
 func (k Keeper) GetIBCAccount(ctx sdk.Context, addr sdk.AccAddress) (types.IBCAccount, error) {

@@ -274,13 +274,6 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet) error 
 	}
 
 	switch data.Type {
-	case types.Type_REGISTER:
-		_, err := k.registerIBCAccount(ctx, packet.SourcePort, packet.SourceChannel, packet.DestinationPort, packet.DestinationChannel, data.Data)
-		if err != nil {
-			return err
-		}
-
-		return nil
 	case types.Type_RUNTX:
 		msgs, err := k.DeserializeTx(ctx, data.Data)
 		if err != nil {
@@ -303,7 +296,6 @@ func (k Keeper) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Pac
 	case types.Type_REGISTER:
 		if ack.Code == 0 {
 			if k.hook != nil {
-				k.hook.OnAccountCreated(ctx, packet.SourcePort, packet.SourceChannel, k.GenerateAddress(types.GetIdentifier(packet.DestinationPort, packet.DestinationChannel), data.Data))
 			}
 		}
 		return nil

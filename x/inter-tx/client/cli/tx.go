@@ -39,19 +39,19 @@ func GetTxCmd() *cobra.Command {
 
 func getRegisterAccountCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "register",
+		Use: "register [connection_id] [counter_party_channel_id]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			sourcePort := viper.GetString(FlagSourcePort)
-			sourceChannel := viper.GetString(FlagSourceChannel)
+			connectionId := args[0]
+			counterPartyChannelId := args[1]
 
 			msg := types.NewMsgRegisterAccount(
-				sourcePort,
-				sourceChannel,
+				connectionId,
+				counterPartyChannelId,
 				clientCtx.GetFromAddress().String(),
 			)
 
@@ -62,11 +62,7 @@ func getRegisterAccountCmd() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-	cmd.Flags().AddFlagSet(fsSourcePort)
-	cmd.Flags().AddFlagSet(fsSourceChannel)
 
-	_ = cmd.MarkFlagRequired(FlagSourcePort)
-	_ = cmd.MarkFlagRequired(FlagSourceChannel)
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
