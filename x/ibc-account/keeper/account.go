@@ -3,42 +3,17 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
 	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
 	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-// This function binds the port for the owner & opens a channel
-// TODO:
-// When an account is successfully registered you should set the active channel, do this in the onOpenTry
 func (k Keeper) RegisterIBCAccount(ctx sdk.Context, owner, connectionId, counterPartyChannelId string) error {
-	//TODO:
-	// If the port is already bound & the account was created successfully, then exit
-	cap := k.portKeeper.BindPort(ctx, owner)
-	err := k.ClaimCapability(ctx, cap, host.PortPath(owner))
+	cap := k.portKeeper.BindPort(ctx, "cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am")
+	err := k.ClaimCapability(ctx, cap, host.PortPath("cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am"))
 	if err != nil {
 		return err
 	}
-
-	counterParty := channeltypes.Counterparty{PortId: "ibcaccount", ChannelId: counterPartyChannelId}
-	order := channeltypes.Order(2)
-	_, _, err = k.channelKeeper.ChanOpenInit(ctx, order, []string{connectionId}, owner, cap, counterParty, "ics27-1")
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			channeltypes.EventTypeChannelOpenInit,
-			sdk.NewAttribute(channeltypes.AttributeKeyPortID, owner),
-			sdk.NewAttribute(channeltypes.AttributeKeyChannelID, "channel-1"),
-			sdk.NewAttribute(channeltypes.AttributeCounterpartyPortID, "ibcaccount"),
-			sdk.NewAttribute(channeltypes.AttributeCounterpartyChannelID, counterPartyChannelId),
-			sdk.NewAttribute(channeltypes.AttributeKeyConnectionID, connectionId),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, channeltypes.AttributeValueCategory),
-		),
-	})
 
 	return err
 }

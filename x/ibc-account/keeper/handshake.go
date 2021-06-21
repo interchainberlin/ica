@@ -5,10 +5,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
-	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
 	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
-
-	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 )
 
 func (k Keeper) OnChanOpenInit(
@@ -21,10 +18,6 @@ func (k Keeper) OnChanOpenInit(
 	counterparty channeltypes.Counterparty,
 	version string,
 ) error {
-	if version != types.Version {
-		return sdkerrors.Wrapf(porttypes.ErrInvalidPort, "invalid version: %s, expected %s", version, "ics20-1")
-	}
-
 	if order != channeltypes.ORDERED {
 		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelOrdering, "invalid channel ordering: %s, expected %s", order.String(), channeltypes.ORDERED.String())
 	}
@@ -48,15 +41,6 @@ func (k Keeper) OnChanOpenTry(
 	version,
 	counterpartyVersion string,
 ) error {
-	boundPort := k.GetPort(ctx)
-	if boundPort != portID {
-		return sdkerrors.Wrapf(porttypes.ErrInvalidPort, "invalid port: %s, expected %s", portID, boundPort)
-	}
-
-	if version != types.Version {
-		return sdkerrors.Wrapf(porttypes.ErrInvalidPort, "invalid version: %s, expected %s", version, "ics20-1")
-	}
-
 	if order != channeltypes.ORDERED {
 		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelOrdering, "invalid channel ordering: %s, expected %s", order.String(), channeltypes.ORDERED.String())
 	}

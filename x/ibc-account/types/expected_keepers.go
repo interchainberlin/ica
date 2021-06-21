@@ -43,4 +43,5 @@ type ConnectionKeeper interface {
 // PortKeeper defines the expected IBC port keeper
 type PortKeeper interface {
 	BindPort(ctx sdk.Context, portID string) *capabilitytypes.Capability
+	LookupModuleByPort(ctx sdk.Context, portID string) (string, *capabilitytypes.Capability, error)
 }

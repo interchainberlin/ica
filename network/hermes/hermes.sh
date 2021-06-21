@@ -30,3 +30,4 @@ hermes -c $CONFIG_DIR tx raw chan-open-ack test-1 test-2 connection-0 transfer t
 # chan-open-confirm
 hermes -c $CONFIG_DIR tx raw chan-open-confirm test-2 test-1 connection-0 transfer transfer -d channel-0 -s channel-0
 
+
