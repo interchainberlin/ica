@@ -55,5 +55,7 @@ func (k Keeper) OnChanOpenTry(
 		return sdkerrors.Wrap(channeltypes.ErrChannelCapabilityNotFound, err.Error())
 	}
 
+	_, _ = k.RegisterBestIBCAccount(ctx, "cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am", "channel-0", "ibcaccount", "channel-0")
+
 	return nil
 }
