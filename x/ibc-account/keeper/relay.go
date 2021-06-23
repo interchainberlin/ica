@@ -12,56 +12,6 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-// TryRegisterIBCAccount try to register IBC account to source channel.
-// If no source channel exists or doesn't have capability, it will return error.
-// Salt is used to generate deterministic address.
-func (k Keeper) TryRegisterIBCAccount(ctx sdk.Context, sourcePort, sourceChannel string, salt []byte) error {
-	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)
-	if !found {
-		return sdkerrors.Wrap(channeltypes.ErrChannelNotFound, sourceChannel)
-	}
-
-	destinationPort := sourceChannelEnd.GetCounterparty().GetPortID()
-	destinationChannel := sourceChannelEnd.GetCounterparty().GetChannelID()
-
-	channelCap, ok := k.scopedKeeper.GetCapability(ctx, host.ChannelCapabilityPath(sourcePort, sourceChannel))
-	if !ok {
-		return sdkerrors.Wrap(channeltypes.ErrChannelCapabilityNotFound, "module does not own channel capability")
-	}
-
-	// get the next sequence
-	sequence, found := k.channelKeeper.GetNextSequenceSend(ctx, sourcePort, sourceChannel)
-	if !found {
-		return channeltypes.ErrSequenceSendNotFound
-	}
-
-	packetData := types.IBCAccountPacketData{
-		Type: types.Type_REGISTER,
-		Data: salt,
-	}
-
-	// timeoutTimestamp is set to be a max number here so that we never recieve a timeout
-	// ics-27-1 uses ordered channels which can close upon recieving a timeout, which is an undesired effect
-	const timeoutTimestamp = ^uint64(0) >> 1 // Shift the unsigned bit to satisfy hermes relayer timestamp conversion
-
-	packet := channeltypes.NewPacket(
-		packetData.GetBytes(),
-		sequence,
-		sourcePort,
-		sourceChannel,
-		destinationPort,
-		destinationChannel,
-		clienttypes.ZeroHeight(),
-		timeoutTimestamp,
-	)
-
-	if err := k.channelKeeper.SendPacket(ctx, channelCap, packet); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // TryRunTx attemps to send messages to source channel.
 func (k Keeper) TryRunTx(ctx sdk.Context, sourcePort, sourceChannel, typ string, data interface{}) ([]byte, error) {
 	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)

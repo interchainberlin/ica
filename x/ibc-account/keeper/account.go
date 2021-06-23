@@ -11,14 +11,16 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-// check if the port is already bound
-// if so, do not bind, do not open channel
-// the port should be bound with the prefix "ics27-1-"
-//TODO: rename this function
-func (k Keeper) RegisterIBCAccount(ctx sdk.Context, owner string) error {
-	//TODO: type this
-	prefix := "ics27-1-"
-	portId := prefix + strings.TrimSpace(owner)
+// The first step in registering an interchain account
+// Binds a new port & calls OnChanOpenInit
+func (k Keeper) InitInterchainAccount(ctx sdk.Context, owner string) error {
+	portId := types.IcaPrefix + strings.TrimSpace(owner)
+
+	// Check if the port is already bound
+	isBound := k.IsBound(ctx, portId)
+	if isBound == true {
+		return sdkerrors.Wrap(types.ErrPortAlreadyBound, portId)
+	}
 
 	cap := k.portKeeper.BindPort(ctx, portId)
 	err := k.ClaimCapability(ctx, cap, host.PortPath(portId))
@@ -29,25 +31,57 @@ func (k Keeper) RegisterIBCAccount(ctx sdk.Context, owner string) error {
 	return err
 }
 
-// RegisterIBCAccount performs registering IBC account
-// Here we need to register the account, set the active channel
-// TODO we probably need a counter of some sort in order to check for address conflicts when creating an account
-// The generated address needs to be deterministic on both sides
-func (k Keeper) RegisterBestIBCAccount(ctx sdk.Context, portId string) (types.IBCAccountI, error) {
+// Register interchain account if it has not already been created
+// TODO: if the address is already taken we need a mechanism to work around. The address needs to be deterministic on both sending/recieving chain
+func (k Keeper) RegisterInterchainAccount(ctx sdk.Context, portId string) (types.IBCAccountI, error) {
 	address := k.GenerateAddress(portId)
-
 	account := k.accountKeeper.GetAccount(ctx, address)
+
 	if account != nil {
 		return nil, sdkerrors.Wrap(types.ErrAccountAlreadyExist, account.String())
 	}
 
-	ibcAccount := types.NewIBCAccount(
+	interchainAccount := types.NewIBCAccount(
 		authtypes.NewBaseAccountWithAddress(address),
 		portId,
 	)
-	k.accountKeeper.NewAccount(ctx, ibcAccount)
-	k.accountKeeper.SetAccount(ctx, ibcAccount)
-	return ibcAccount, nil
+	k.accountKeeper.NewAccount(ctx, interchainAccount)
+	k.accountKeeper.SetAccount(ctx, interchainAccount)
+	return interchainAccount, nil
+}
+
+func (k Keeper) SetActiveChannel(ctx sdk.Context, portId, channelId string) error {
+	store := ctx.KVStore(k.storeKey)
+
+	key := types.KeyActiveChannel(portId)
+	store.Set(key, []byte(channelId))
+	return nil
+}
+
+func (k Keeper) GetActiveChannel(ctx sdk.Context, portId string) (string, error) {
+	store := ctx.KVStore(k.storeKey)
+	key := types.KeyActiveChannel(portId)
+	if !store.Has(key) {
+		return "", sdkerrors.Wrap(types.ErrActiveChannelNotFound, portId)
+	}
+
+	activeChannel := string(store.Get(key))
+	return activeChannel, nil
+}
+
+func (k Keeper) SetAccountAddress(ctx sdk.Context, portId string) sdk.AccAddress {
+	store := ctx.KVStore(k.storeKey)
+	address := sdk.AccAddress(k.GenerateAddress(portId))
+	key := types.KeyOwnerAccount(portId)
+	store.Set(key, address)
+	return address
+}
+
+func (k Keeper) GetInterchainAccountAddress(ctx sdk.Context, portId string) string {
+	store := ctx.KVStore(k.storeKey)
+	key := types.KeyOwnerAccount(portId)
+	interchainAccountAddr := sdk.AccAddress(store.Get(key))
+	return interchainAccountAddr.String()
 }
 
 // Determine account's address that will be created.

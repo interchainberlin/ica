@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
@@ -18,6 +20,9 @@ func (k Keeper) OnChanOpenInit(
 	counterparty channeltypes.Counterparty,
 	version string,
 ) error {
+	//TODO:
+	// check version string
+
 	if order != channeltypes.ORDERED {
 		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelOrdering, "invalid channel ordering: %s, expected %s", order.String(), channeltypes.ORDERED.String())
 	}
@@ -44,6 +49,7 @@ func (k Keeper) OnChanOpenTry(
 	version,
 	counterpartyVersion string,
 ) error {
+	fmt.Print("TESTSEAN")
 	if order != channeltypes.ORDERED {
 		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelOrdering, "invalid channel ordering: %s, expected %s", order.String(), channeltypes.ORDERED.String())
 	}
@@ -58,8 +64,8 @@ func (k Keeper) OnChanOpenTry(
 		return sdkerrors.Wrap(channeltypes.ErrChannelCapabilityNotFound, err.Error())
 	}
 
-	_, _ = k.RegisterBestIBCAccount(ctx, portID)
-
+	// Register interchain account if it does not already exist
+	_, _ = k.RegisterInterchainAccount(ctx, portID)
 	return nil
 }
 
@@ -73,10 +79,14 @@ func (k Keeper) OnChanOpenAck(
 	channelID string,
 	counterpartyVersion string,
 ) error {
-	if counterpartyVersion != "ics27-1" {
-		return nil
-		//return sdkerrors.Wrapf(channeltypes.ErrInvalidVersion, "invalid counterparty version: %s, expected %s", counterpartyVersion, "ics27-1")
-	}
+	fmt.Print("SEANSEAN2")
+	k.SetActiveChannel(ctx, portID, channelID)
+	k.SetAccountAddress(ctx, portID)
+
+	//	if counterpartyVersion != "ics27-1" {
+	//		return nil
+	//		//return sdkerrors.Wrapf(channeltypes.ErrInvalidVersion, "invalid counterparty version: %s, expected %s", counterpartyVersion, "ics27-1")
+	//	}
 	return nil
 }
 
@@ -86,6 +96,8 @@ func (k Keeper) OnChanOpenConfirm(
 	portID,
 	channelID string,
 ) error {
+	k.SetActiveChannel(ctx, portID, channelID)
+
 	return nil
 }
 

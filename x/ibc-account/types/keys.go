@@ -24,6 +24,14 @@ const (
 	MemStoreKey = "mem_capability"
 )
 
+func KeyActiveChannel(portId string) []byte {
+	return []byte(fmt.Sprintf("activeChannel/%s", portId))
+}
+
+func KeyOwnerAccount(portId string) []byte {
+	return []byte(fmt.Sprintf("owner/%s", portId))
+}
+
 var (
 	KeyPrefixRegisteredAccount = []byte("register")
 )

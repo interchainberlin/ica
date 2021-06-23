@@ -11,7 +11,7 @@ func (keeper Keeper) RegisterIBCAccount(
 	ctx sdk.Context,
 	sender sdk.AccAddress,
 ) error {
-	err := keeper.iaKeeper.RegisterIBCAccount(ctx, sender.String())
+	err := keeper.iaKeeper.InitInterchainAccount(ctx, sender.String())
 	if err != nil {
 		return err
 	}

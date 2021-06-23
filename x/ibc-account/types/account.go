@@ -11,6 +11,10 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+const (
+	IcaPrefix string = "ics27-1-"
+)
+
 type IBCAccountI interface {
 	authtypes.AccountI
 }
