@@ -39,19 +39,14 @@ func GetTxCmd() *cobra.Command {
 
 func getRegisterAccountCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "register [connection_id] [counter_party_channel_id]",
+		Use: "register",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			connectionId := args[0]
-			counterPartyChannelId := args[1]
-
 			msg := types.NewMsgRegisterAccount(
-				connectionId,
-				counterPartyChannelId,
 				clientCtx.GetFromAddress().String(),
 			)
 

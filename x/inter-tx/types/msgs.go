@@ -16,12 +16,10 @@ var _ sdk.Msg = &MsgRegisterAccount{}
 
 // NewMsgRegisterAccount creates a new MsgRegisterAccount instance
 func NewMsgRegisterAccount(
-	connectionId, counterPartyChannelId, owner string,
+	owner string,
 ) *MsgRegisterAccount {
 	return &MsgRegisterAccount{
-		ConnectionId:          connectionId,
-		CounterPartyChannelId: counterPartyChannelId,
-		Owner:                 owner,
+		Owner: owner,
 	}
 }
 

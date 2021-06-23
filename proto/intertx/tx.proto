@@ -20,13 +20,7 @@ message MsgRegisterAccount {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 
-  // the port by which the packet will be sent
-  string connection_id = 2 [(gogoproto.moretags) = "yaml:\"connection_id\""];
-
-  // the channel by which the packet will be sent
-  string counter_party_channel_id = 3 [(gogoproto.moretags) = "yaml:\"source_channel\""];
-
-  string owner=6;
+  string owner=1;
 }
 
 message MsgRegisterAccountResponse {}

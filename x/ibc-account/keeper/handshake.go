@@ -30,6 +30,9 @@ func (k Keeper) OnChanOpenInit(
 	return nil
 }
 
+// register account (if it doesn't exist)
+// check if counterpary version is the same
+// TODO: remove ics27-1 hardcoded
 func (k Keeper) OnChanOpenTry(
 	ctx sdk.Context,
 	order channeltypes.Order,
@@ -55,7 +58,53 @@ func (k Keeper) OnChanOpenTry(
 		return sdkerrors.Wrap(channeltypes.ErrChannelCapabilityNotFound, err.Error())
 	}
 
-	_, _ = k.RegisterBestIBCAccount(ctx, "cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am", "channel-0", "ibcaccount", "channel-0")
+	_, _ = k.RegisterBestIBCAccount(ctx, portID)
 
 	return nil
 }
+
+// Set Active Channel
+// Map account -> owner
+//   - This is for "GetAccount"
+// TODO: remove ics27-1 hardcoded
+func (k Keeper) OnChanOpenAck(
+	ctx sdk.Context,
+	portID,
+	channelID string,
+	counterpartyVersion string,
+) error {
+	if counterpartyVersion != "ics27-1" {
+		return nil
+		//return sdkerrors.Wrapf(channeltypes.ErrInvalidVersion, "invalid counterparty version: %s, expected %s", counterpartyVersion, "ics27-1")
+	}
+	return nil
+}
+
+// Set active channel
+func (k Keeper) OnChanOpenConfirm(
+	ctx sdk.Context,
+	portID,
+	channelID string,
+) error {
+	return nil
+}
+
+// May want to use these for re-opening a channel when it is closed
+//// OnChanCloseInit implements the IBCModule interface
+//func (am AppModule) OnChanCloseInit(
+//	ctx sdk.Context,
+//	portID,
+//	channelID string,
+//) error {
+//	// Disallow user-initiated channel closing for transfer channels
+//	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "user cannot close channel")
+//}
+//
+//// OnChanCloseConfirm implements the IBCModule interface
+//func (am AppModule) OnChanCloseConfirm(
+//	ctx sdk.Context,
+//	portID,
+//	channelID string,
+//) error {
+//	return nil
+//}

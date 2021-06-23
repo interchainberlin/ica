@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -9,9 +11,17 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-func (k Keeper) RegisterIBCAccount(ctx sdk.Context, owner, connectionId, counterPartyChannelId string) error {
-	cap := k.portKeeper.BindPort(ctx, "cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am")
-	err := k.ClaimCapability(ctx, cap, host.PortPath("cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am"))
+// check if the port is already bound
+// if so, do not bind, do not open channel
+// the port should be bound with the prefix "ics27-1-"
+//TODO: rename this function
+func (k Keeper) RegisterIBCAccount(ctx sdk.Context, owner string) error {
+	//TODO: type this
+	prefix := "ics27-1-"
+	portId := prefix + strings.TrimSpace(owner)
+
+	cap := k.portKeeper.BindPort(ctx, portId)
+	err := k.ClaimCapability(ctx, cap, host.PortPath(portId))
 	if err != nil {
 		return err
 	}
@@ -19,25 +29,21 @@ func (k Keeper) RegisterIBCAccount(ctx sdk.Context, owner, connectionId, counter
 	return err
 }
 
-// RegisterIBCAccount performs registering IBC account.
-// It will generate the deterministic address by hashing {sourcePort}/{sourceChannel}/{salt}.
-func (k Keeper) RegisterBestIBCAccount(ctx sdk.Context, sourcePort, sourceChannel, destPort, destChannel string) (types.IBCAccountI, error) {
-	identifier := types.GetIdentifier(destPort, destChannel)
-	address := k.GenerateAddress(identifier)
+// RegisterIBCAccount performs registering IBC account
+// Here we need to register the account, set the active channel
+// TODO we probably need a counter of some sort in order to check for address conflicts when creating an account
+// The generated address needs to be deterministic on both sides
+func (k Keeper) RegisterBestIBCAccount(ctx sdk.Context, portId string) (types.IBCAccountI, error) {
+	address := k.GenerateAddress(portId)
 
 	account := k.accountKeeper.GetAccount(ctx, address)
-	// TODO: Discuss the vulnerabilities when creating a new account only if the old account does not exist
-	// Attackers can interrupt creating accounts by sending some assets before the packet is delivered.
-	// So it is needed to check that the account is not created from users.
-	// Returns an error only if the account was created by other chain.
-	// We need to discuss how we can judge this case.
 	if account != nil {
 		return nil, sdkerrors.Wrap(types.ErrAccountAlreadyExist, account.String())
 	}
 
 	ibcAccount := types.NewIBCAccount(
 		authtypes.NewBaseAccountWithAddress(address),
-		sourcePort, sourceChannel, destPort, destChannel,
+		portId,
 	)
 	k.accountKeeper.NewAccount(ctx, ibcAccount)
 	k.accountKeeper.SetAccount(ctx, ibcAccount)

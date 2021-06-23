@@ -174,12 +174,6 @@ func (k Keeper) DeserializeTx(_ sdk.Context, txBytes []byte) ([]sdk.Msg, error) 
 }
 
 func (k Keeper) runTx(ctx sdk.Context, destPort, destChannel string, msgs []sdk.Msg) error {
-	identifier := types.GetIdentifier(destPort, destChannel)
-	err := k.AuthenticateTx(ctx, msgs, identifier)
-	if err != nil {
-		return err
-	}
-
 	for _, msg := range msgs {
 		err := msg.ValidateBasic()
 		if err != nil {
@@ -195,7 +189,7 @@ func (k Keeper) runTx(ctx sdk.Context, destPort, destChannel string, msgs []sdk.
 	// To solve this problem, use cache context instead of context,
 	// and write the state transition if handler succeeds.
 	cacheContext, writeFn := ctx.CacheContext()
-	err = nil
+	var err error
 	for _, msg := range msgs {
 		_, msgErr := k.runMsg(cacheContext, msg)
 		if msgErr != nil {
@@ -210,40 +204,6 @@ func (k Keeper) runTx(ctx sdk.Context, destPort, destChannel string, msgs []sdk.
 
 	// Write the state transitions if all handlers succeed.
 	writeFn()
-
-	return nil
-}
-
-// AuthenticateTx verifies that the messages have the right permission.
-// It will check that the message's signers are the IBC account created by the right chain.
-func (k Keeper) AuthenticateTx(ctx sdk.Context, msgs []sdk.Msg, identifier string) error {
-	seen := map[string]bool{}
-	var signers []sdk.AccAddress
-	for _, msg := range msgs {
-		for _, addr := range msg.GetSigners() {
-			if !seen[addr.String()] {
-				signers = append(signers, addr)
-				seen[addr.String()] = true
-			}
-		}
-	}
-
-	for _, signer := range signers {
-		// Check where the interchain account is made from.
-		account := k.accountKeeper.GetAccount(ctx, signer)
-		if account == nil {
-			return sdkerrors.ErrUnauthorized
-		}
-
-		ibcAccount, ok := account.(types.IBCAccountI)
-		if !ok {
-			return sdkerrors.ErrUnauthorized
-		}
-
-		if types.GetIdentifier(ibcAccount.GetDestinationPort(), ibcAccount.GetDestinationChannel()) != identifier {
-			return sdkerrors.ErrUnauthorized
-		}
-	}
 
 	return nil
 }

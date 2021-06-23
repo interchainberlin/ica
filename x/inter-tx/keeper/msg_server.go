@@ -32,8 +32,6 @@ func (k msgServer) Register(
 	err = k.RegisterIBCAccount(
 		ctx,
 		acc,
-		msg.ConnectionId,
-		msg.CounterPartyChannelId,
 	)
 	if err != nil {
 		return &types.MsgRegisterAccountResponse{}, err

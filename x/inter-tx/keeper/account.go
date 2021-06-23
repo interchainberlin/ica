@@ -10,10 +10,8 @@ import (
 func (keeper Keeper) RegisterIBCAccount(
 	ctx sdk.Context,
 	sender sdk.AccAddress,
-	connectionId,
-	counterPartyChannelId string,
 ) error {
-	err := keeper.iaKeeper.RegisterIBCAccount(ctx, sender.String(), connectionId, counterPartyChannelId)
+	err := keeper.iaKeeper.RegisterIBCAccount(ctx, sender.String())
 	if err != nil {
 		return err
 	}
