@@ -28,6 +28,8 @@ func (k Keeper) InitInterchainAccount(ctx sdk.Context, owner string) error {
 		return err
 	}
 
+	//TODO: Add call to OnChanOpenInit. The hermes relayer currently does not support this.
+
 	return err
 }
 

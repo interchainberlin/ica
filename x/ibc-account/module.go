@@ -170,11 +170,7 @@ func (am AppModule) OnChanOpenAck(
 	channelID string,
 	counterpartyVersion string,
 ) error {
-	// TODO
-	// if counterpartyVersion != types.Version {
-	//	return sdkerrors.Wrapf(porttypes.ErrInvalidPort, "invalid counterparty version: %s, expected %s", counterpartyVersion, "ics20-1")
-	// }
-	return nil
+	return am.keeper.OnChanOpenAck(ctx, portID, channelID, counterpartyVersion)
 }
 
 func (am AppModule) OnChanOpenConfirm(
@@ -182,7 +178,7 @@ func (am AppModule) OnChanOpenConfirm(
 	portID,
 	channelID string,
 ) error {
-	return nil
+	return am.keeper.OnChanOpenConfirm(ctx, portID, channelID)
 }
 
 func (am AppModule) OnChanCloseInit(

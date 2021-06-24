@@ -20,7 +20,6 @@ func (k Keeper) OnChanOpenInit(
 ) error {
 	//TODO:
 	// check version string
-
 	if order != channeltypes.ORDERED {
 		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelOrdering, "invalid channel ordering: %s, expected %s", order.String(), channeltypes.ORDERED.String())
 	}
@@ -79,10 +78,6 @@ func (k Keeper) OnChanOpenAck(
 	k.SetActiveChannel(ctx, portID, channelID)
 	k.SetInterchainAccountAddress(ctx, portID)
 
-	//	if counterpartyVersion != "ics27-1" {
-	//		return nil
-	//		//return sdkerrors.Wrapf(channeltypes.ErrInvalidVersion, "invalid counterparty version: %s, expected %s", counterpartyVersion, "ics27-1")
-	//	}
 	return nil
 }
 
@@ -107,7 +102,7 @@ func (k Keeper) OnChanOpenConfirm(
 //	// Disallow user-initiated channel closing for transfer channels
 //	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "user cannot close channel")
 //}
-//
+
 //// OnChanCloseConfirm implements the IBCModule interface
 //func (am AppModule) OnChanCloseConfirm(
 //	ctx sdk.Context,
