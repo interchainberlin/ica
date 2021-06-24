@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/binary"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -13,16 +14,25 @@ import (
 )
 
 // TryRunTx attemps to send messages to source channel.
-func (k Keeper) TryRunTx(ctx sdk.Context, sourcePort, sourceChannel, typ string, data interface{}) ([]byte, error) {
-	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePort, sourceChannel)
+// TODO: There needs to be a signature check here to ensure the port-id == signer address
+func (k Keeper) TryRunTx(ctx sdk.Context, accountOwner sdk.AccAddress, data interface{}) ([]byte, error) {
+	// Check for the active channel
+	activeChannelId, err := k.GetActiveChannel(ctx, accountOwner.String())
+	if err != nil {
+		return nil, err
+	}
+
+	sourcePortId := types.IcaPrefix + strings.TrimSpace(accountOwner.String())
+
+	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePortId, activeChannelId)
 	if !found {
-		return []byte{}, sdkerrors.Wrap(channeltypes.ErrChannelNotFound, sourceChannel)
+		return []byte{}, sdkerrors.Wrap(channeltypes.ErrChannelNotFound, activeChannelId)
 	}
 
 	destinationPort := sourceChannelEnd.GetCounterparty().GetPortID()
 	destinationChannel := sourceChannelEnd.GetCounterparty().GetChannelID()
 
-	return k.createOutgoingPacket(ctx, sourcePort, sourceChannel, destinationPort, destinationChannel, typ, data)
+	return k.createOutgoingPacket(ctx, sourcePortId, activeChannelId, destinationPort, destinationChannel, "cosmos-sdk", data)
 }
 
 func (k Keeper) createOutgoingPacket(
@@ -161,12 +171,12 @@ func (k Keeper) runTx(ctx sdk.Context, destPort, destChannel string, msgs []sdk.
 // RunMsg executes the message.
 // It tries to get the handler from router. And, if router exites, it will perform message.
 func (k Keeper) runMsg(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
-	hander := k.router.Route(ctx, msg.Route())
-	if hander == nil {
+	handler := k.router.Route(ctx, msg.Route())
+	if handler == nil {
 		return nil, types.ErrInvalidRoute
 	}
 
-	return hander(ctx, msg)
+	return handler(ctx, msg)
 }
 
 // Compute the virtual tx hash that is used only internally.
@@ -178,7 +188,7 @@ func (k Keeper) ComputeVirtualTxHash(txBytes []byte, seq uint64) []byte {
 
 func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet) error {
 	var data types.IBCAccountPacketData
-	// TODO: Remove the usage of global variable "ModuleCdc"
+
 	if err := types.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal interchain account packet data: %s", err.Error())
 	}
@@ -203,12 +213,6 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet) error 
 
 func (k Keeper) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Packet, data types.IBCAccountPacketData, ack types.IBCAccountPacketAcknowledgement) error {
 	switch ack.Type {
-	case types.Type_REGISTER:
-		if ack.Code == 0 {
-			if k.hook != nil {
-			}
-		}
-		return nil
 	case types.Type_RUNTX:
 		if ack.Code == 0 {
 			if k.hook != nil {

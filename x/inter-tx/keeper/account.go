@@ -1,7 +1,10 @@
 package keeper
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	icatypes "github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 )
 
@@ -22,19 +25,11 @@ func (keeper Keeper) RegisterIBCAccount(
 }
 
 // GetIBCAccount returns an interchain account address
-func (keeper Keeper) GetIBCAccount(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) (types.QueryIBCAccountFromAddressResponse, error) {
-	store := ctx.KVStore(keeper.storeKey)
+func (keeper Keeper) GetIBCAccount(ctx sdk.Context, owner sdk.AccAddress) (string, error) {
+	portId := icatypes.IcaPrefix + strings.TrimSpace(owner.String())
+	address, err := keeper.iaKeeper.GetInterchainAccountAddress(ctx, portId)
 
-	key := types.KeyRegisteredAccount(sourcePort, sourceChannel, address)
-	if !store.Has(key) {
-		return types.QueryIBCAccountFromAddressResponse{}, types.ErrIBCAccountNotExist
-	}
-	res := types.QueryIBCAccountFromAddressResponse{}
-	addr := store.Get(key)
-
-	res.Address = addr
-
-	return res, nil
+	return address, err
 }
 
 // GetIncrementalSalt increments the Salt value by 1 and returns the Salt
@@ -46,6 +41,7 @@ func (keeper Keeper) GetIncrementalSalt(ctx sdk.Context) string {
 	salt := types.Salt{
 		Salt: 0,
 	}
+
 	if kvStore.Has(key) {
 		keeper.cdc.MustUnmarshalBinaryBare(kvStore.Get(key), &salt)
 		salt.Salt++

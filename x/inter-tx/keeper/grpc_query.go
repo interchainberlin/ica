@@ -26,10 +26,14 @@ func (k Keeper) IBCAccountFromAddress(ctx context.Context, req *types.QueryIBCAc
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	ibcAccount, err := k.GetIBCAccount(sdkCtx, req.Port, req.Channel, req.Address)
+
+	addr, err := k.GetIBCAccount(sdkCtx, req.Address)
 	if err != nil {
 		return nil, err
 	}
+
+	accAddr, _ := sdk.AccAddressFromBech32(addr)
+	ibcAccount := types.QueryIBCAccountFromAddressResponse{Address: accAddr}
 
 	return &ibcAccount, nil
 }

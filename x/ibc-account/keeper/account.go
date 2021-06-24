@@ -69,7 +69,7 @@ func (k Keeper) GetActiveChannel(ctx sdk.Context, portId string) (string, error)
 	return activeChannel, nil
 }
 
-func (k Keeper) SetAccountAddress(ctx sdk.Context, portId string) sdk.AccAddress {
+func (k Keeper) SetInterchainAccountAddress(ctx sdk.Context, portId string) sdk.AccAddress {
 	store := ctx.KVStore(k.storeKey)
 	address := sdk.AccAddress(k.GenerateAddress(portId))
 	key := types.KeyOwnerAccount(portId)
@@ -77,11 +77,15 @@ func (k Keeper) SetAccountAddress(ctx sdk.Context, portId string) sdk.AccAddress
 	return address
 }
 
-func (k Keeper) GetInterchainAccountAddress(ctx sdk.Context, portId string) string {
+func (k Keeper) GetInterchainAccountAddress(ctx sdk.Context, portId string) (string, error) {
 	store := ctx.KVStore(k.storeKey)
 	key := types.KeyOwnerAccount(portId)
+	if !store.Has(key) {
+		return "", sdkerrors.Wrap(types.ErrIBCAccountNotFound, portId)
+	}
+
 	interchainAccountAddr := sdk.AccAddress(store.Get(key))
-	return interchainAccountAddr.String()
+	return interchainAccountAddr.String(), nil
 }
 
 // Determine account's address that will be created.

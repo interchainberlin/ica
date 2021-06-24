@@ -14,13 +14,15 @@ func (keeper Keeper) TrySendCoins(ctx sdk.Context,
 	toAddr sdk.AccAddress,
 	amt sdk.Coins,
 ) error {
-	ibcAccount, err := keeper.GetIBCAccount(ctx, sourcePort, sourceChannel, fromAddr)
+	ibcAccount, err := keeper.GetIBCAccount(ctx, fromAddr)
 	if err != nil {
 		return err
 	}
 
-	msg := banktypes.NewMsgSend(ibcAccount.Address, toAddr, amt)
+	//TODO: I think we do not need to pass an accAddr to NewMsgSend
+	acc, _ := sdk.AccAddressFromBech32(ibcAccount)
+	msg := banktypes.NewMsgSend(acc, toAddr, amt)
 
-	_, err = keeper.iaKeeper.TryRunTx(ctx, sourcePort, sourceChannel, typ, msg)
+	_, err = keeper.iaKeeper.TryRunTx(ctx, fromAddr, msg)
 	return err
 }

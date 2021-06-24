@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
@@ -49,7 +47,6 @@ func (k Keeper) OnChanOpenTry(
 	version,
 	counterpartyVersion string,
 ) error {
-	fmt.Print("TESTSEAN")
 	if order != channeltypes.ORDERED {
 		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelOrdering, "invalid channel ordering: %s, expected %s", order.String(), channeltypes.ORDERED.String())
 	}
@@ -79,9 +76,8 @@ func (k Keeper) OnChanOpenAck(
 	channelID string,
 	counterpartyVersion string,
 ) error {
-	fmt.Print("SEANSEAN2")
 	k.SetActiveChannel(ctx, portID, channelID)
-	k.SetAccountAddress(ctx, portID)
+	k.SetInterchainAccountAddress(ctx, portID)
 
 	//	if counterpartyVersion != "ics27-1" {
 	//		return nil
