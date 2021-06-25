@@ -7,3 +7,5 @@ hermes -c ./network/hermes/config.toml tx raw chan-open-init test-1 test-2 conne
 hermes -c $CONFIG_DIR tx raw chan-open-try test-2 test-1 connection-0 ibcaccount $PORT_ID -s channel-0
 hermes -c $CONFIG_DIR tx raw chan-open-ack test-1 test-2 connection-0 $PORT_ID ibcaccount -d channel-0 -s channel-0
 hermes -c $CONFIG_DIR tx raw chan-open-confirm test-2 test-1 connection-0 ibcaccount $PORT_ID -d channel-0 -s channel-0
+
+
