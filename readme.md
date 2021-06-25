@@ -31,7 +31,7 @@ export VAL_1=cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am
 export VAL_2=cosmos17dtl0mjt3t77kpuhg2edqzjpszulwhgzuj9ljs
 
 # Register an IBC Account on chain test-2 
-icad tx intertx register --from val1 --source-port ibcaccount --source-channel channel-0 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 -y
+icad tx intertx register --from val1 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 -y
 
 # Get the address of interchain account
 icad query intertx ibcaccount $VAL_1 ibcaccount channel-0 --node tcp://localhost:16657
@@ -48,7 +48,7 @@ icad tx bank send val2 $IBC_ACCOUNT 1000stake --chain-id test-2 --home ./data/te
 icad q bank balances $IBC_ACCOUNT --chain-id test-2 --node tcp://localhost:26657
 
 # Test sending assets from interchain account via ibc.
-icad tx intertx send cosmos-sdk $VAL_2 500stake --source-port ibcaccount --source-channel channel-0 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 --from val1 -y
+icad tx intertx send cosmos-sdk $VAL_2 500stake --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 --from val1 -y
 
 # Wait until the relayer has relayed the packet
 

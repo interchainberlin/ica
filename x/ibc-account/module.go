@@ -3,6 +3,7 @@ package ibc_account
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/cosmos/interchain-accounts/x/ibc-account/client/cli"
 
@@ -202,46 +203,21 @@ func (am AppModule) OnRecvPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
 ) (*sdk.Result, []byte, error) {
+	ack := channeltypes.NewResultAcknowledgement([]byte{byte(1)})
+
 	var data types.IBCAccountPacketData
-	// TODO: Remove the usage of global variable "ModuleCdc"
 	if err := types.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
-		return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal interchain account packet data: %s", err.Error())
+		return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-27 interchain account packet data: %s", err.Error())
 	}
 
 	err := am.keeper.OnRecvPacket(ctx, packet)
-
-	switch data.Type {
-	case types.Type_REGISTER:
-		acknowledgement := types.IBCAccountPacketAcknowledgement{
-			ChainID: ctx.ChainID(),
-		}
-		if err == nil {
-			acknowledgement.Code = 0
-		} else {
-			acknowledgement.Code = 1
-			acknowledgement.Error = err.Error()
-		}
-
-		return &sdk.Result{
-			Events: ctx.EventManager().Events().ToABCIEvents(),
-		}, acknowledgement.GetBytes(), nil
-	case types.Type_RUNTX:
-		acknowledgement := types.IBCAccountPacketAcknowledgement{
-			ChainID: ctx.ChainID(),
-		}
-		if err == nil {
-			acknowledgement.Code = 0
-		} else {
-			acknowledgement.Code = 1
-			acknowledgement.Error = err.Error()
-		}
-
-		return &sdk.Result{
-			Events: ctx.EventManager().Events().ToABCIEvents(),
-		}, acknowledgement.GetBytes(), nil
-	default:
-		return nil, nil, types.ErrUnknownPacketData
+	if err != nil {
+		ack = channeltypes.NewErrorAcknowledgement(fmt.Sprintf("cannot unmarshal interchain account packet data: %s", err.Error()))
 	}
+
+	return &sdk.Result{
+		Events: ctx.EventManager().Events().ToABCIEvents(),
+	}, ack.GetBytes(), nil
 }
 
 func (am AppModule) OnAcknowledgementPacket(
@@ -249,7 +225,8 @@ func (am AppModule) OnAcknowledgementPacket(
 	packet channeltypes.Packet,
 	acknowledgement []byte,
 ) (*sdk.Result, error) {
-	var ack types.IBCAccountPacketAcknowledgement
+	var ack channeltypes.Acknowledgement
+
 	if err := types.ModuleCdc.UnmarshalJSON(acknowledgement, &ack); err != nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-27 interchain account packet acknowledgment: %v", err)
 	}
@@ -261,8 +238,6 @@ func (am AppModule) OnAcknowledgementPacket(
 	if err := am.keeper.OnAcknowledgementPacket(ctx, packet, data, ack); err != nil {
 		return nil, err
 	}
-
-	// TODO: Add events.
 
 	return &sdk.Result{
 		Events: ctx.EventManager().Events().ToABCIEvents(),

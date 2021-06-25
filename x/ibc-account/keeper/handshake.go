@@ -65,10 +65,6 @@ func (k Keeper) OnChanOpenTry(
 	return nil
 }
 
-// Set Active Channel
-// Map account -> owner
-//   - This is for "GetAccount"
-// TODO: remove ics27-1 hardcoded
 func (k Keeper) OnChanOpenAck(
 	ctx sdk.Context,
 	portID,
@@ -87,7 +83,6 @@ func (k Keeper) OnChanOpenConfirm(
 	portID,
 	channelID string,
 ) error {
-	k.SetActiveChannel(ctx, portID, channelID)
 
 	return nil
 }

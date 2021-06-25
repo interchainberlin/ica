@@ -17,7 +17,8 @@ import (
 // TODO: There needs to be a signature check here to ensure the port-id == signer address
 func (k Keeper) TryRunTx(ctx sdk.Context, accountOwner sdk.AccAddress, data interface{}) ([]byte, error) {
 	// Check for the active channel
-	activeChannelId, err := k.GetActiveChannel(ctx, accountOwner.String())
+	portId := types.IcaPrefix + strings.TrimSpace(accountOwner.String())
+	activeChannelId, err := k.GetActiveChannel(ctx, portId)
 	if err != nil {
 		return nil, err
 	}
@@ -141,13 +142,6 @@ func (k Keeper) runTx(ctx sdk.Context, destPort, destChannel string, msgs []sdk.
 		}
 	}
 
-	// Use cache context.
-	// Receive packet msg should succeed regardless of the result of logic.
-	// But, if we just return the success even though handler is failed,
-	// the leftovers of state transition in handler will remain.
-	// However, this can make the unexpected error.
-	// To solve this problem, use cache context instead of context,
-	// and write the state transition if handler succeeds.
 	cacheContext, writeFn := ctx.CacheContext()
 	var err error
 	for _, msg := range msgs {
@@ -211,21 +205,22 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet) error 
 	}
 }
 
-func (k Keeper) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Packet, data types.IBCAccountPacketData, ack types.IBCAccountPacketAcknowledgement) error {
-	switch ack.Type {
-	case types.Type_RUNTX:
-		if ack.Code == 0 {
-			if k.hook != nil {
-				k.hook.OnTxSucceeded(ctx, packet.SourcePort, packet.SourceChannel, k.ComputeVirtualTxHash(data.Data, packet.Sequence), data.Data)
-			}
-		} else {
-			if k.hook != nil {
-				k.hook.OnTxFailed(ctx, packet.SourcePort, packet.SourceChannel, k.ComputeVirtualTxHash(data.Data, packet.Sequence), data.Data)
-			}
+func (k Keeper) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Packet, data types.IBCAccountPacketData, ack channeltypes.Acknowledgement) error {
+	switch ack.Response.(type) {
+	case *channeltypes.Acknowledgement_Error:
+		if k.hook != nil {
+			k.hook.OnTxFailed(ctx, packet.SourcePort, packet.SourceChannel, k.ComputeVirtualTxHash(data.Data, packet.Sequence), data.Data)
+		}
+		return nil
+	case *channeltypes.Acknowledgement_Result:
+		if k.hook != nil {
+			k.hook.OnTxSucceeded(ctx, packet.SourcePort, packet.SourceChannel, k.ComputeVirtualTxHash(data.Data, packet.Sequence), data.Data)
 		}
 		return nil
 	default:
-		panic("unknown type of acknowledgement")
+		// the acknowledgement succeeded on the receiving chain so nothing
+		// needs to be executed and no error needs to be returned
+		return nil
 	}
 }
 

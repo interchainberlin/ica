@@ -1,5 +1,5 @@
 [global]
-log_level = 'debug'
+log_level = 'trace'
 strategy = 'all'
 
 [[chains]]

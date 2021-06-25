@@ -20,7 +20,7 @@ message MsgRegisterAccount {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 
-  string owner=1;
+  string owner = 1;
 }
 
 message MsgRegisterAccountResponse {}

@@ -4,4 +4,4 @@
 CONFIG_DIR=./network/hermes/config.toml
 
 echo "Starting hermes relayer..."
-#hermes -c $CONFIG_DIR start
+hermes -c $CONFIG_DIR start
