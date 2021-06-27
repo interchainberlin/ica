@@ -7,8 +7,8 @@ This repo contains an ongoing refactor/update of https://github.com/chainapsis/c
 
 ```bash
 # Clone this repository and build
-git clone git@github.com:cosmos/interchain-account.git 
-cd ica
+git clone https://github.com/cosmos/interchain-accounts.git
+cd interchain-accounts
 make install 
 
 # Hermes Relayer
