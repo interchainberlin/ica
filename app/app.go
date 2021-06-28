@@ -88,6 +88,7 @@ import (
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	intertx "github.com/cosmos/interchain-accounts/x/inter-tx"
+	intertxclient "github.com/cosmos/interchain-accounts/x/inter-tx/client"
 	intertxkeeper "github.com/cosmos/interchain-accounts/x/inter-tx/keeper"
 	intertxtypes "github.com/cosmos/interchain-accounts/x/inter-tx/types"
 )
@@ -105,6 +106,9 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		distrclient.ProposalHandler,
 		upgradeclient.ProposalHandler,
 		upgradeclient.CancelProposalHandler,
+		intertxclient.SendProposalHandler,
+		intertxclient.FundProposalHandler,
+
 		// this line is used by starport scaffolding # stargate/app/govProposalHandler
 	)
 
@@ -209,8 +213,8 @@ type App struct {
 	ScopedTransferKeeper   capabilitykeeper.ScopedKeeper
 	ScopedIbcAccountKeeper capabilitykeeper.ScopedKeeper
 
-	ibcAccountKeeper ibcaccountkeeper.Keeper
-	interTxKeeper    intertxkeeper.Keeper
+	IbcAccountKeeper ibcaccountkeeper.Keeper
+	InterTxKeeper    intertxkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -309,14 +313,6 @@ func New(
 		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, scopedIBCKeeper,
 	)
 
-	// register the proposal types
-	govRouter := govtypes.NewRouter()
-	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.IBCKeeper.ClientKeeper))
-
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
@@ -325,16 +321,25 @@ func New(
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
-	app.ibcAccountKeeper = ibcaccountkeeper.NewKeeper(keys[ibcaccounttypes.MemStoreKey], appCodec, keys[ibcaccounttypes.StoreKey],
+	app.IbcAccountKeeper = ibcaccountkeeper.NewKeeper(keys[ibcaccounttypes.MemStoreKey], appCodec, keys[ibcaccounttypes.StoreKey],
 		map[string]ibcaccounttypes.TxEncoder{
 			// register the tx encoder for cosmos-sdk
 			"cosmos-sdk": ibcaccountkeeper.SerializeCosmosTx(appCodec, interfaceRegistry),
 		}, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, scopedIbcAccountKeeper, app.Router(), app,
-	)
-	ibcAccountModule := ibcaccount.NewAppModule(app.ibcAccountKeeper)
+		app.AccountKeeper, scopedIbcAccountKeeper, app.Router(), app)
 
-	app.interTxKeeper = intertxkeeper.NewKeeper(appCodec, keys[intertxtypes.StoreKey], app.ibcAccountKeeper)
+	ibcAccountModule := ibcaccount.NewAppModule(app.IbcAccountKeeper)
+
+	app.InterTxKeeper = intertxkeeper.NewKeeper(appCodec, keys[intertxtypes.StoreKey], app.IbcAccountKeeper, app.DistrKeeper, app.AccountKeeper, app.TransferKeeper)
+
+	// register the proposal types
+	govRouter := govtypes.NewRouter()
+	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
+		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(intertxtypes.RouterKey, intertx.NewInterchainAccountProposalHandler(app.InterTxKeeper))
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
@@ -386,7 +391,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		ibcAccountModule,
-		intertx.NewAppModule(appCodec, app.interTxKeeper),
+		intertx.NewAppModule(appCodec, app.InterTxKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -621,7 +626,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 }
 
 func (app *App) OnAccountCreated(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) {
-	app.interTxKeeper.OnAccountCreated(ctx, sourcePort, sourceChannel, address)
+	app.InterTxKeeper.OnAccountCreated(ctx, sourcePort, sourceChannel, address)
 }
 
 func (*App) OnTxSucceeded(ctx sdk.Context, sourcePort, sourceChannel string, txHash []byte, txBytes []byte) {

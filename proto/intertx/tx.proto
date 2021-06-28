@@ -12,10 +12,11 @@ import "cosmos/base/v1beta1/coin.proto";
 
 service Msg {
   rpc Register(MsgRegisterAccount) returns (MsgRegisterAccountResponse);
+  rpc RegisterCommunityPool(MsgRegisterCommunityAccount) returns (MsgRegisterCommunityAccountResponse);
   rpc Send(MsgSend) returns (MsgSendResponse);
 }
 
-//MsgRegisterAccount is used to register an interchain account on a target chain 
+//MsgRegisterAccount is used to register an interchain account on a target chain
 message MsgRegisterAccount {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
@@ -30,6 +31,22 @@ message MsgRegisterAccount {
 }
 
 message MsgRegisterAccountResponse {}
+
+//MsgRegisterAccount is used to register an interchain account on a target chain
+message MsgRegisterCommunityAccount {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // the port by which the packet will be sent
+  string source_port = 2 [(gogoproto.moretags) = "yaml:\"source_port\""];
+
+  // the channel by which the packet will be sent
+  string source_channel = 3 [(gogoproto.moretags) = "yaml:\"source_channel\""];
+
+  string signer = 4 [(gogoproto.moretags) = "yaml:\"signer\""];
+}
+
+message MsgRegisterCommunityAccountResponse {}
 
 // MsgSend is used to send coins from an interchain account to another account on the same chain
 message MsgSend {
@@ -47,8 +64,50 @@ message MsgSend {
   bytes   to_address                      = 7 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   repeated cosmos.base.v1beta1.Coin amount = 8
       [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  string coin = 9;
 }
 
 // MsgSendResponse defines the Msg/Send response type.
 message MsgSendResponse {}
+
+message MsgSendProposal {
+    option (gogoproto.goproto_getters)  = true;
+    option (gogoproto.goproto_stringer) = true;
+
+    string title       = 1 [(gogoproto.moretags) = "yaml:\"title\""];
+    string description = 2 [(gogoproto.moretags) = "yaml:\"description\""];
+
+    // the port on which the packet will be sent
+    string source_port = 3 [
+        (gogoproto.moretags) = "yaml:\"source_port\""
+    ];
+    // the channel by which the packet will be sent
+    string source_channel = 4 [
+        (gogoproto.moretags) = "yaml:\"source_channel\""
+    ];
+
+    bytes   to_address                      = 7 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    repeated cosmos.base.v1beta1.Coin amount = 8
+        [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+
+    // the port on which the packet will be sent
+    string coin = 9 [
+        (gogoproto.moretags) = "yaml:\"coin\""
+    ];
+}
+
+message MsgFundProposal {
+    option (gogoproto.goproto_getters)  = true;
+    option (gogoproto.goproto_stringer) = true;
+
+    string title       = 1 [(gogoproto.moretags) = "yaml:\"title\""];
+    string description = 2 [(gogoproto.moretags) = "yaml:\"description\""];
+
+    // the channel by which the packet will be sent
+    string source_channel = 3 [
+        (gogoproto.moretags) = "yaml:\"source_channel\""
+    ];
+
+    string coin       = 4 [(gogoproto.moretags) = "yaml:\"coin\""];
+}
 

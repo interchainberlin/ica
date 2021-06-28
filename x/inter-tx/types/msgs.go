@@ -1,14 +1,16 @@
 package types
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"strings"
 )
 
 const (
-	TypeMsgRegisterAccount = "register"
-	TypeMsgSend            = "send"
+	TypeMsgRegisterAccount          = "register"
+	TypeMsgRegisterCommunityAccount = "register_community"
+	TypeMsgSend                     = "send"
 )
 
 var _ sdk.Msg = &MsgRegisterAccount{}
@@ -55,11 +57,52 @@ func (msg MsgRegisterAccount) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{accAddr}
 }
 
+// Register Community Pool
+var _ sdk.Msg = &MsgRegisterCommunityAccount{}
+
+func NewMsgRegisterCommunityAccount(
+	port, channel, signer string,
+) *MsgRegisterCommunityAccount {
+	return &MsgRegisterCommunityAccount{
+		SourcePort:    port,
+		SourceChannel: channel,
+		Signer:        signer,
+	}
+}
+
+// Route implements sdk.Msg
+func (MsgRegisterCommunityAccount) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (MsgRegisterCommunityAccount) Type() string {
+	return TypeMsgRegisterCommunityAccount
+}
+
+func (msg MsgRegisterCommunityAccount) ValidateBasic() error {
+	return nil
+}
+
+func (msg MsgRegisterCommunityAccount) GetSignBytes() []byte {
+	panic("IBC messages do not support amino")
+}
+
+// GetSigners implements sdk.Msg
+func (msg MsgRegisterCommunityAccount) GetSigners() []sdk.AccAddress {
+	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{accAddr}
+}
+
+//Send
 var _ sdk.Msg = &MsgSend{}
 
 // NewMsgSend creates a new MsgSend instance
 func NewMsgSend(
-	chainType, port, channel string, sender, toAddress sdk.AccAddress, amount sdk.Coins,
+	chainType, port, channel string, sender, toAddress sdk.AccAddress, amount sdk.Coins, coin string,
 ) *MsgSend {
 	return &MsgSend{
 		ChainType:     chainType,
@@ -68,6 +111,7 @@ func NewMsgSend(
 		Sender:        sender,
 		ToAddress:     toAddress,
 		Amount:        amount,
+		Coin:          coin,
 	}
 }
 

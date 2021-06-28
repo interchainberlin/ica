@@ -1,0 +1,9 @@
+{
+  "title": "Test Proposal",
+  "description": "Registering interchain account",
+  "source_port": "ibcaccount",
+  "source_channel": "channel-0",
+  "to_address": "cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am",
+  "amount": "1000",
+  "coin": "stake"
+}

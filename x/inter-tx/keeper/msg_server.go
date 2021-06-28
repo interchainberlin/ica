@@ -41,11 +41,44 @@ func (k msgServer) Register(
 		msg.SourcePort,
 		msg.SourceChannel,
 	)
+
 	if err != nil {
 		return &types.MsgRegisterAccountResponse{}, err
 	}
 
 	return &types.MsgRegisterAccountResponse{}, nil
+}
+
+// Register checks if an interchain account has account is already registered and if so returns an error.
+// If no account has been registered we call RegisterIBCAccount which uses the ibc-account module keeper to send an outgoing IBC packet with a REGISTER message type.
+func (k msgServer) RegisterCommunityPool(
+	goCtx context.Context,
+	msg *types.MsgRegisterCommunityAccount,
+) (*types.MsgRegisterCommunityAccountResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	acc := k.AuthKeeper.GetModuleAddress("distribution")
+	if acc == nil {
+		return &types.MsgRegisterCommunityAccountResponse{}, nil
+	}
+
+	// check if an account is already registered
+	_, err := k.GetIBCAccount(ctx, msg.SourcePort, msg.SourceChannel, acc)
+	if err == nil {
+		return &types.MsgRegisterCommunityAccountResponse{}, types.ErrIBCAccountAlreadyExist
+	}
+
+	//TODO: no need to use salt with registering account. only one account should be allowed for the distrbution module
+	err = k.RegisterIBCAccount(
+		ctx,
+		acc,
+		msg.SourcePort,
+		msg.SourceChannel,
+	)
+	if err != nil {
+		return &types.MsgRegisterCommunityAccountResponse{}, err
+	}
+
+	return &types.MsgRegisterCommunityAccountResponse{}, nil
 }
 
 // Send is used to send tokens from an interchain account to another account on a target chain
