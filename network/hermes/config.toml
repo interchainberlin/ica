@@ -3,39 +3,32 @@ log_level = 'trace'
 strategy = 'all'
 
 [[chains]]
-account_prefix = 'cosmos'
-clock_drift = '5s'
-fee_amount = 10
-fee_denom = 'stake'
-gas = 3000000
-grpc_addr = 'http://127.0.0.1:8090'
 id = 'test-1'
-key_name = 'testkey'
 rpc_addr = 'http://127.0.0.1:16657'
-rpc_timeout = '10s'
-store_prefix = 'ibc'
-trusting_period = '14days'
+grpc_addr = 'http://127.0.0.1:8090'
 websocket_addr = 'ws://127.0.0.1:16657/websocket'
-
-[chains.trust_threshold]
-denominator = '3'
-numerator = '1'
+rpc_timeout = '10s'
+account_prefix = 'cosmos'
+key_name = 'testkey'
+store_prefix = 'ibc'
+max_gas = 3000000
+gas_price = { price = 0.001, denom = 'stake' }
+clock_drift = '5s'
+trusting_period = '14days'
+trust_threshold = { numerator = '1', denominator = '3' }
 
 [[chains]]
-account_prefix = 'cosmos'
-clock_drift = '5s'
-fee_amount = 1000
-fee_denom = 'stake'
-gas = 3000000
-grpc_addr = 'http://127.0.0.1:9090'
 id = 'test-2'
-key_name = 'testkey'
 rpc_addr = 'http://127.0.0.1:26657'
-rpc_timeout = '10s'
-store_prefix = 'ibc'
-trusting_period = '14days'
+grpc_addr = 'http://127.0.0.1:9090'
 websocket_addr = 'ws://127.0.0.1:26657/websocket'
+rpc_timeout = '10s'
+account_prefix = 'cosmos'
+key_name = 'testkey'
+store_prefix = 'ibc'
+max_gas = 3000000
+gas_price = { price = 0.001, denom = 'stake' }
+clock_drift = '5s'
+trusting_period = '14days'
+trust_threshold = { numerator = '1', denominator = '3' }
 
-[chains.trust_threshold]
-denominator = '3'
-numerator = '1'
