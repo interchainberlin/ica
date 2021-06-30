@@ -33,7 +33,7 @@ func (k Keeper) TryRunTx(ctx sdk.Context, accountOwner sdk.AccAddress, data inte
 	destinationPort := sourceChannelEnd.GetCounterparty().GetPortID()
 	destinationChannel := sourceChannelEnd.GetCounterparty().GetChannelID()
 
-	return k.createOutgoingPacket(ctx, sourcePortId, activeChannelId, destinationPort, destinationChannel, "cosmos-sdk", data)
+	return k.createOutgoingPacket(ctx, sourcePortId, activeChannelId, destinationPort, destinationChannel, data)
 }
 
 func (k Keeper) createOutgoingPacket(
@@ -41,18 +41,12 @@ func (k Keeper) createOutgoingPacket(
 	sourcePort,
 	sourceChannel,
 	destinationPort,
-	destinationChannel,
-	typ string,
+	destinationChannel string,
 	data interface{},
 ) ([]byte, error) {
 
 	if data == nil {
 		return []byte{}, types.ErrInvalidOutgoingData
-	}
-
-	txEncoder, ok := k.GetTxEncoder(typ)
-	if !ok {
-		return []byte{}, types.ErrUnsupportedChain
 	}
 
 	var msgs []sdk.Msg
@@ -66,7 +60,7 @@ func (k Keeper) createOutgoingPacket(
 		return []byte{}, types.ErrInvalidOutgoingData
 	}
 
-	txBytes, err := txEncoder(msgs)
+	txBytes, err := k.SerializeCosmosTx(k.cdc, msgs)
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(err, "invalid packet data or codec")
 	}
