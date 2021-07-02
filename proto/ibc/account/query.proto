@@ -11,15 +11,10 @@ option go_package = "github.com/cosmos/interchain-accounts/x/ibc-account/types";
 // Query defines the gRPC querier service.
 service Query {
   rpc IBCAccount(QueryIBCAccountRequest) returns (QueryIBCAccountResponse) {
-    option (google.api.http).get =
-        "/cosmos/ibc-account/v1beta1/ibc-account/{address}";
   }
 
   rpc IBCAccountFromData(QueryIBCAccountFromDataRequest)
       returns (QueryIBCAccountResponse) {
-    option (google.api.http).get =
-        "/cosmos/ibc-account/v1beta1/ibc-account-from-data/{port}/{channel}/"
-        "{data}";
   }
 }
 

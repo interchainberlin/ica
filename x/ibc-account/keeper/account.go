@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -8,7 +10,6 @@ import (
 	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
 	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
-	"strings"
 )
 
 // The first step in registering an interchain account
@@ -22,21 +23,24 @@ func (k Keeper) InitInterchainAccount(ctx sdk.Context, owner string) error {
 		return sdkerrors.Wrap(types.ErrPortAlreadyBound, portId)
 	}
 
-	cap := k.portKeeper.BindPort(ctx, portId)
-	err := k.ClaimCapability(ctx, cap, host.PortPath(portId))
+	portCap := k.portKeeper.BindPort(ctx, portId)
+	err := k.ClaimCapability(ctx, portCap, host.PortPath(portId))
 	if err != nil {
 		return err
 	}
+
 	connectionId := "connection-0"
 	counterParty := channeltypes.Counterparty{PortId: "ibcaccount", ChannelId: ""}
 	order := channeltypes.Order(2)
-	_, _, err = k.channelKeeper.ChanOpenInit(ctx, order, []string{connectionId}, portId, cap, counterParty, "ics27-1")
+
+	channelId, cap, err := k.channelKeeper.ChanOpenInit(ctx, order, []string{connectionId}, portId, portCap, counterParty, types.Version)
+	_ = k.OnChanOpenInit(ctx, channeltypes.Order(2), []string{connectionId}, portId, channelId, cap, counterParty, types.Version)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			channeltypes.EventTypeChannelOpenInit,
 			sdk.NewAttribute(channeltypes.AttributeKeyPortID, portId),
-			sdk.NewAttribute(channeltypes.AttributeKeyChannelID, "channel-0"),
+			sdk.NewAttribute(channeltypes.AttributeKeyChannelID, channelId),
 			sdk.NewAttribute(channeltypes.AttributeCounterpartyPortID, "ibcaccount"),
 			sdk.NewAttribute(channeltypes.AttributeCounterpartyChannelID, ""),
 			sdk.NewAttribute(channeltypes.AttributeKeyConnectionID, connectionId),

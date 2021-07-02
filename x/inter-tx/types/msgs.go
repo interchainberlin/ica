@@ -58,15 +58,12 @@ var _ sdk.Msg = &MsgSend{}
 
 // NewMsgSend creates a new MsgSend instance
 func NewMsgSend(
-	chainType, port, channel string, sender, toAddress sdk.AccAddress, amount sdk.Coins,
+	sender, toAddress sdk.AccAddress, amount sdk.Coins,
 ) *MsgSend {
 	return &MsgSend{
-		ChainType:     chainType,
-		SourcePort:    port,
-		SourceChannel: channel,
-		Sender:        sender,
-		ToAddress:     toAddress,
-		Amount:        amount,
+		Sender:    sender,
+		ToAddress: toAddress,
+		Amount:    amount,
 	}
 }
 

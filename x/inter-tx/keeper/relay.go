@@ -7,9 +7,6 @@ import (
 
 // TrySendCoins builds a banktypes.NewMsgSend and uses the ibc-account module keeper to send the message to another chain
 func (keeper Keeper) TrySendCoins(ctx sdk.Context,
-	sourcePort,
-	sourceChannel string,
-	typ string,
 	fromAddr sdk.AccAddress,
 	toAddr sdk.AccAddress,
 	amt sdk.Coins,
@@ -19,7 +16,6 @@ func (keeper Keeper) TrySendCoins(ctx sdk.Context,
 		return err
 	}
 
-	//TODO: I think we do not need to pass an accAddr to NewMsgSend
 	acc, _ := sdk.AccAddressFromBech32(ibcAccount)
 	msg := banktypes.NewMsgSend(acc, toAddr, amt)
 

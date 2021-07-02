@@ -10,7 +10,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -65,33 +64,26 @@ func getRegisterAccountCmd() *cobra.Command {
 
 func getSendTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "send [type] [to_address] [amount]",
-		Args: cobra.ExactArgs(3),
+		Use:  "send [to_address] [amount]",
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			chainType := args[0]
 			fromAddress := clientCtx.GetFromAddress()
-			toAddress, err := sdk.AccAddressFromBech32(args[1])
+			toAddress, err := sdk.AccAddressFromBech32(args[0])
 			if err != nil {
 				return err
 			}
 
-			amount, err := sdk.ParseCoinsNormalized(args[2])
+			amount, err := sdk.ParseCoinsNormalized(args[1])
 			if err != nil {
 				return err
 			}
-
-			sourcePort := viper.GetString(FlagSourcePort)
-			sourceChannel := viper.GetString(FlagSourceChannel)
 
 			msg := types.NewMsgSend(
-				chainType,
-				sourcePort,
-				sourceChannel,
 				fromAddress,
 				toAddress,
 				amount,
@@ -103,11 +95,6 @@ func getSendTxCmd() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-	cmd.Flags().AddFlagSet(fsSourcePort)
-	cmd.Flags().AddFlagSet(fsSourceChannel)
-
-	_ = cmd.MarkFlagRequired(FlagSourcePort)
-	_ = cmd.MarkFlagRequired(FlagSourceChannel)
 
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
