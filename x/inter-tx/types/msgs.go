@@ -16,10 +16,12 @@ var _ sdk.Msg = &MsgRegisterAccount{}
 
 // NewMsgRegisterAccount creates a new MsgRegisterAccount instance
 func NewMsgRegisterAccount(
-	owner string,
+	owner,
+	connectionId string,
 ) *MsgRegisterAccount {
 	return &MsgRegisterAccount{
-		Owner: owner,
+		Owner:        owner,
+		ConnectionId: connectionId,
 	}
 }
 
@@ -58,12 +60,13 @@ var _ sdk.Msg = &MsgSend{}
 
 // NewMsgSend creates a new MsgSend instance
 func NewMsgSend(
-	sender, toAddress sdk.AccAddress, amount sdk.Coins,
+	sender, toAddress sdk.AccAddress, amount sdk.Coins, connectionId string,
 ) *MsgSend {
 	return &MsgSend{
-		Sender:    sender,
-		ToAddress: toAddress,
-		Amount:    amount,
+		Sender:       sender,
+		ToAddress:    toAddress,
+		Amount:       amount,
+		ConnectionId: connectionId,
 	}
 }
 

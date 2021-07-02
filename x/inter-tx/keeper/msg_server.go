@@ -17,8 +17,6 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-// Register checks if an interchain account has account is already registered and if so returns an error.
-// If no account has been registered we call RegisterIBCAccount which uses the ibc-account module keeper to send an outgoing IBC packet with a REGISTER message type.
 func (k msgServer) Register(
 	goCtx context.Context,
 	msg *types.MsgRegisterAccount,
@@ -29,9 +27,10 @@ func (k msgServer) Register(
 		return &types.MsgRegisterAccountResponse{}, err
 	}
 
-	err = k.RegisterIBCAccount(
+	err = k.RegisterInterchainAccount(
 		ctx,
 		acc,
+		msg.ConnectionId,
 	)
 	if err != nil {
 		return &types.MsgRegisterAccountResponse{}, err
@@ -44,7 +43,7 @@ func (k msgServer) Register(
 // The inter-tx module keeper uses the ibc-account module keeper to build and send an IBC packet with the RUNTX type
 func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	err := k.TrySendCoins(ctx, msg.Sender, msg.ToAddress, msg.Amount)
+	err := k.TrySendCoins(ctx, msg.Sender, msg.ToAddress, msg.Amount, msg.ConnectionId)
 	if err != nil {
 		return nil, err
 	}

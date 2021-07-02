@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/interchain-accounts/x/inter-tx/types"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -38,15 +39,18 @@ func GetTxCmd() *cobra.Command {
 
 func getRegisterAccountCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "register",
+		Use: "register --connection-id",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
+			connectionId := viper.GetString(FlagConnectionId)
+
 			msg := types.NewMsgRegisterAccount(
 				clientCtx.GetFromAddress().String(),
+				connectionId,
 			)
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -57,6 +61,9 @@ func getRegisterAccountCmd() *cobra.Command {
 		},
 	}
 
+	cmd.Flags().AddFlagSet(fsConnectionId)
+	_ = cmd.MarkFlagRequired(FlagConnectionId)
+
 	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
@@ -64,7 +71,7 @@ func getRegisterAccountCmd() *cobra.Command {
 
 func getSendTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "send [to_address] [amount]",
+		Use:  "send [to_address] [amount] --connection-id",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -83,10 +90,13 @@ func getSendTxCmd() *cobra.Command {
 				return err
 			}
 
+			connectionId := viper.GetString(FlagConnectionId)
+
 			msg := types.NewMsgSend(
 				fromAddress,
 				toAddress,
 				amount,
+				connectionId,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -95,6 +105,10 @@ func getSendTxCmd() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
+
+	cmd.Flags().AddFlagSet(fsConnectionId)
+
+	_ = cmd.MarkFlagRequired(FlagConnectionId)
 
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd

@@ -18,3 +18,7 @@ message IBCAccountPacketData {
   Type type = 1;
   bytes data = 2;
 }
+ 
+message AccountAddress {
+  string address = 1;
+}

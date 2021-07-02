@@ -61,7 +61,7 @@ func (k Keeper) OnChanOpenTry(
 	}
 
 	// Register interchain account if it does not already exist
-	_, _ = k.RegisterInterchainAccount(ctx, portID)
+	_, _ = k.RegisterInterchainAccount(ctx, counterparty.PortId)
 	return nil
 }
 
@@ -72,7 +72,6 @@ func (k Keeper) OnChanOpenAck(
 	counterpartyVersion string,
 ) error {
 	k.SetActiveChannel(ctx, portID, channelID)
-	k.SetInterchainAccountAddress(ctx, portID)
 
 	return nil
 }

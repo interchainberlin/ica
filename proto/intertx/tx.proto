@@ -21,6 +21,7 @@ message MsgRegisterAccount {
   option (gogoproto.goproto_getters) = false;
 
   string owner = 1;
+  string connectionId = 2;
 }
 
 message MsgRegisterAccountResponse {}
@@ -31,6 +32,7 @@ message MsgSend {
   bytes   to_address                      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   repeated cosmos.base.v1beta1.Coin amount = 3
       [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  string  connectionId = 4;
 }
 
 // MsgSendResponse defines the Msg/Send response type.

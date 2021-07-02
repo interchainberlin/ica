@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/binary"
-	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -13,19 +12,15 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-// TryRunTx attemps to send messages to source channel.
-// TODO: There needs to be a signature check here to ensure the port-id == signer address
-func (k Keeper) TryRunTx(ctx sdk.Context, accountOwner sdk.AccAddress, data interface{}) ([]byte, error) {
+func (k Keeper) TryRunTx(ctx sdk.Context, accountOwner sdk.AccAddress, connectionId string, data interface{}) ([]byte, error) {
+	portId := k.GeneratePortId(accountOwner.String(), connectionId)
 	// Check for the active channel
-	portId := types.IcaPrefix + strings.TrimSpace(accountOwner.String())
 	activeChannelId, err := k.GetActiveChannel(ctx, portId)
 	if err != nil {
 		return nil, err
 	}
 
-	sourcePortId := types.IcaPrefix + strings.TrimSpace(accountOwner.String())
-
-	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, sourcePortId, activeChannelId)
+	sourceChannelEnd, found := k.channelKeeper.GetChannel(ctx, portId, activeChannelId)
 	if !found {
 		return []byte{}, sdkerrors.Wrap(channeltypes.ErrChannelNotFound, activeChannelId)
 	}
@@ -33,7 +28,7 @@ func (k Keeper) TryRunTx(ctx sdk.Context, accountOwner sdk.AccAddress, data inte
 	destinationPort := sourceChannelEnd.GetCounterparty().GetPortID()
 	destinationChannel := sourceChannelEnd.GetCounterparty().GetChannelID()
 
-	return k.createOutgoingPacket(ctx, sourcePortId, activeChannelId, destinationPort, destinationChannel, data)
+	return k.createOutgoingPacket(ctx, portId, activeChannelId, destinationPort, destinationChannel, data)
 }
 
 func (k Keeper) createOutgoingPacket(
@@ -200,7 +195,7 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet) error 
 }
 
 func (k Keeper) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Packet, data types.IBCAccountPacketData, ack channeltypes.Acknowledgement) error {
-	switch ack.Response.(type) {
+	switch response := ack.Response.(type) {
 	case *channeltypes.Acknowledgement_Error:
 		if k.hook != nil {
 			k.hook.OnTxFailed(ctx, packet.SourcePort, packet.SourceChannel, k.ComputeVirtualTxHash(data.Data, packet.Sequence), data.Data)
@@ -210,6 +205,15 @@ func (k Keeper) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Pac
 		if k.hook != nil {
 			k.hook.OnTxSucceeded(ctx, packet.SourcePort, packet.SourceChannel, k.ComputeVirtualTxHash(data.Data, packet.Sequence), data.Data)
 		}
+		// return if the interchain account address is already set
+		_, err := k.GetInterchainAccountAddress(ctx, packet.SourcePort)
+		if err == nil {
+			return nil
+		}
+
+		// if not keep track of the registered interchain account address
+		interchainAccountAddr := string(response.Result)
+		k.SetInterchainAccountAddress(ctx, packet.SourcePort, interchainAccountAddr)
 		return nil
 	default:
 		// the acknowledgement succeeded on the receiving chain so nothing

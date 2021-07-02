@@ -2,10 +2,12 @@ package keeper
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
@@ -120,4 +122,36 @@ func (k Keeper) GetPort(ctx sdk.Context) string {
 // passes to it
 func (k Keeper) ClaimCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) error {
 	return k.scopedKeeper.ClaimCapability(ctx, cap, name)
+}
+
+// Utility function for parsing the connection number from the connection-id
+func getConnectionNumber(connectionId string) string {
+	ss := strings.Split(connectionId, "-")
+	return ss[len(ss)-1]
+}
+
+func (k Keeper) GeneratePortId(owner, connectionId string) string {
+	ownerId := strings.TrimSpace(owner)
+	connectionNumber := getConnectionNumber(connectionId)
+	portId := types.IcaPrefix + connectionNumber + "-" + ownerId
+	return portId
+}
+
+func (k Keeper) SetActiveChannel(ctx sdk.Context, portId, channelId string) error {
+	store := ctx.KVStore(k.storeKey)
+
+	key := types.KeyActiveChannel(portId)
+	store.Set(key, []byte(channelId))
+	return nil
+}
+
+func (k Keeper) GetActiveChannel(ctx sdk.Context, portId string) (string, error) {
+	store := ctx.KVStore(k.storeKey)
+	key := types.KeyActiveChannel(portId)
+	if !store.Has(key) {
+		return "", sdkerrors.Wrap(types.ErrActiveChannelNotFound, portId)
+	}
+
+	activeChannel := string(store.Get(key))
+	return activeChannel, nil
 }

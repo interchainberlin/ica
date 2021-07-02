@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -14,8 +12,8 @@ import (
 
 // The first step in registering an interchain account
 // Binds a new port & calls OnChanOpenInit
-func (k Keeper) InitInterchainAccount(ctx sdk.Context, owner string) error {
-	portId := types.IcaPrefix + strings.TrimSpace(owner)
+func (k Keeper) InitInterchainAccount(ctx sdk.Context, connectionId, owner string) error {
+	portId := k.GeneratePortId(owner, connectionId)
 
 	// Check if the port is already bound
 	isBound := k.IsBound(ctx, portId)
@@ -29,33 +27,16 @@ func (k Keeper) InitInterchainAccount(ctx sdk.Context, owner string) error {
 		return err
 	}
 
-	connectionId := "connection-0"
 	counterParty := channeltypes.Counterparty{PortId: "ibcaccount", ChannelId: ""}
 	order := channeltypes.Order(2)
 
 	channelId, cap, err := k.channelKeeper.ChanOpenInit(ctx, order, []string{connectionId}, portId, portCap, counterParty, types.Version)
 	_ = k.OnChanOpenInit(ctx, channeltypes.Order(2), []string{connectionId}, portId, channelId, cap, counterParty, types.Version)
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			channeltypes.EventTypeChannelOpenInit,
-			sdk.NewAttribute(channeltypes.AttributeKeyPortID, portId),
-			sdk.NewAttribute(channeltypes.AttributeKeyChannelID, channelId),
-			sdk.NewAttribute(channeltypes.AttributeCounterpartyPortID, "ibcaccount"),
-			sdk.NewAttribute(channeltypes.AttributeCounterpartyChannelID, ""),
-			sdk.NewAttribute(channeltypes.AttributeKeyConnectionID, connectionId),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, channeltypes.AttributeValueCategory),
-		),
-	})
-
 	return err
 }
 
 // Register interchain account if it has not already been created
-// TODO: if the address is already taken we need a mechanism to work around. The address needs to be deterministic on both sending/recieving chain
 func (k Keeper) RegisterInterchainAccount(ctx sdk.Context, portId string) (types.IBCAccountI, error) {
 	address := k.GenerateAddress(portId)
 	account := k.accountKeeper.GetAccount(ctx, address)
@@ -70,33 +51,15 @@ func (k Keeper) RegisterInterchainAccount(ctx sdk.Context, portId string) (types
 	)
 	k.accountKeeper.NewAccount(ctx, interchainAccount)
 	k.accountKeeper.SetAccount(ctx, interchainAccount)
+	_ = k.SetInterchainAccountAddress(ctx, portId, interchainAccount.Address)
+
 	return interchainAccount, nil
 }
 
-func (k Keeper) SetActiveChannel(ctx sdk.Context, portId, channelId string) error {
+func (k Keeper) SetInterchainAccountAddress(ctx sdk.Context, portId string, address string) string {
 	store := ctx.KVStore(k.storeKey)
-
-	key := types.KeyActiveChannel(portId)
-	store.Set(key, []byte(channelId))
-	return nil
-}
-
-func (k Keeper) GetActiveChannel(ctx sdk.Context, portId string) (string, error) {
-	store := ctx.KVStore(k.storeKey)
-	key := types.KeyActiveChannel(portId)
-	if !store.Has(key) {
-		return "", sdkerrors.Wrap(types.ErrActiveChannelNotFound, portId)
-	}
-
-	activeChannel := string(store.Get(key))
-	return activeChannel, nil
-}
-
-func (k Keeper) SetInterchainAccountAddress(ctx sdk.Context, portId string) sdk.AccAddress {
-	store := ctx.KVStore(k.storeKey)
-	address := sdk.AccAddress(k.GenerateAddress(portId))
 	key := types.KeyOwnerAccount(portId)
-	store.Set(key, address)
+	store.Set(key, []byte(address))
 	return address
 }
 
@@ -107,8 +70,8 @@ func (k Keeper) GetInterchainAccountAddress(ctx sdk.Context, portId string) (str
 		return "", sdkerrors.Wrap(types.ErrIBCAccountNotFound, portId)
 	}
 
-	interchainAccountAddr := sdk.AccAddress(store.Get(key))
-	return interchainAccountAddr.String(), nil
+	interchainAccountAddr := string(store.Get(key))
+	return interchainAccountAddr, nil
 }
 
 // Determine account's address that will be created.

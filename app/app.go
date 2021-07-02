@@ -618,10 +618,6 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	return paramsKeeper
 }
 
-func (app *App) OnAccountCreated(ctx sdk.Context, sourcePort, sourceChannel string, address sdk.AccAddress) {
-	app.interTxKeeper.OnAccountCreated(ctx, sourcePort, sourceChannel, address)
-}
-
 func (*App) OnTxSucceeded(ctx sdk.Context, sourcePort, sourceChannel string, txHash []byte, txBytes []byte) {
 }
 

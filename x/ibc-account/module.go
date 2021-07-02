@@ -3,7 +3,6 @@ package ibc_account
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/cosmos/interchain-accounts/x/ibc-account/client/cli"
 
@@ -203,17 +202,22 @@ func (am AppModule) OnRecvPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
 ) (*sdk.Result, []byte, error) {
-	ack := channeltypes.NewResultAcknowledgement([]byte{byte(1)})
-
+	var ack channeltypes.Acknowledgement
 	var data types.IBCAccountPacketData
 	if err := types.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
 		return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-27 interchain account packet data: %s", err.Error())
 	}
 
-	err := am.keeper.OnRecvPacket(ctx, packet)
-	if err != nil {
-		ack = channeltypes.NewErrorAcknowledgement(fmt.Sprintf("cannot unmarshal interchain account packet data: %s", err.Error()))
-	}
+	//	err := am.keeper.OnRecvPacket(ctx, packet)
+	//	if err != nil {
+	//		ack = channeltypes.NewErrorAcknowledgement(fmt.Sprintf("cannot unmarshal interchain account packet data: %s", err.Error()))
+	//	}
+
+	_ = am.keeper.OnRecvPacket(ctx, packet)
+
+	interchainAccountAddr, _ := am.keeper.GetInterchainAccountAddress(ctx, packet.SourcePort)
+	bz := []byte(interchainAccountAddr)
+	ack = channeltypes.NewResultAcknowledgement(bz)
 
 	return &sdk.Result{
 		Events: ctx.EventManager().Events().ToABCIEvents(),

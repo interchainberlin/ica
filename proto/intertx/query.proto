@@ -17,16 +17,13 @@ message QueryIBCAccountFromAddressRequest {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
-  string port = 1;
-  string channel = 2;
-  bytes address = 3
+  bytes address = 1
     [ (gogoproto.casttype) =
        "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+  string connectionId = 2;
 }
  
 message QueryIBCAccountFromAddressResponse {
-  bytes address = 1
-        [ (gogoproto.casttype) =
-       "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+  string address = 1;
 }
 
