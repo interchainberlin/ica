@@ -31,6 +31,21 @@ func (k Keeper) InitInterchainAccount(ctx sdk.Context, connectionId, owner strin
 	order := channeltypes.Order(2)
 
 	channelId, cap, err := k.channelKeeper.ChanOpenInit(ctx, order, []string{connectionId}, portId, portCap, counterParty, types.Version)
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			channeltypes.EventTypeChannelOpenInit,
+			sdk.NewAttribute(channeltypes.AttributeKeyPortID, portId),
+			sdk.NewAttribute(channeltypes.AttributeKeyChannelID, channelId),
+			sdk.NewAttribute(channeltypes.AttributeCounterpartyPortID, "ibcaccount"),
+			sdk.NewAttribute(channeltypes.AttributeCounterpartyChannelID, ""),
+			sdk.NewAttribute(channeltypes.AttributeKeyConnectionID, connectionId),
+		),
+		sdk.NewEvent(
+			sdk.EventTypeMessage,
+			sdk.NewAttribute(sdk.AttributeKeyModule, channeltypes.AttributeValueCategory),
+		),
+	})
+
 	_ = k.OnChanOpenInit(ctx, channeltypes.Order(2), []string{connectionId}, portId, channelId, cap, counterParty, types.Version)
 
 	return err
