@@ -60,13 +60,14 @@ var _ sdk.Msg = &MsgSend{}
 
 // NewMsgSend creates a new MsgSend instance
 func NewMsgSend(
-	sender, toAddress sdk.AccAddress, amount sdk.Coins, connectionId string,
+	interchainAccountAddr string, owner sdk.AccAddress, toAddress string, amount sdk.Coins, connectionId string,
 ) *MsgSend {
 	return &MsgSend{
-		Sender:       sender,
-		ToAddress:    toAddress,
-		Amount:       amount,
-		ConnectionId: connectionId,
+		InterchainAccount: interchainAccountAddr,
+		Owner:             owner,
+		ToAddress:         toAddress,
+		Amount:            amount,
+		ConnectionId:      connectionId,
 	}
 }
 
@@ -82,16 +83,16 @@ func (MsgSend) Type() string {
 
 // GetSigners implements sdk.Msg
 func (msg MsgSend) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Sender}
+	return []sdk.AccAddress{msg.Owner}
 }
 
 // ValidateBasic performs a basic check of the MsgRegisterAccount fields.
 func (msg MsgSend) ValidateBasic() error {
-	if strings.TrimSpace(msg.Sender.String()) == "" {
+	if strings.TrimSpace(msg.InterchainAccount) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing sender address")
 	}
 
-	if strings.TrimSpace(msg.ToAddress.String()) == "" {
+	if strings.TrimSpace(msg.ToAddress) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing recipient address")
 	}
 

@@ -43,7 +43,7 @@ func (k msgServer) Register(
 // The inter-tx module keeper uses the ibc-account module keeper to build and send an IBC packet with the RUNTX type
 func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	err := k.TrySendCoins(ctx, msg.Sender, msg.ToAddress, msg.Amount, msg.ConnectionId)
+	err := k.TrySendCoins(ctx, msg.Owner, msg.InterchainAccount, msg.ToAddress, msg.Amount, msg.ConnectionId)
 	if err != nil {
 		return nil, err
 	}

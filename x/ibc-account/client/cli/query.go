@@ -5,7 +5,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
@@ -27,30 +26,23 @@ func GetQueryCmd() *cobra.Command {
 
 func GetIBCAccountCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use: "ibcaccount [address_or_data] [port] [channel]",
+		Use: "address [address] [connection-id]",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			address, addrErr := sdk.AccAddressFromBech32(args[0])
+			address := args[0]
+			connectionId := args[1]
+
 			queryClient := types.NewQueryClient(clientCtx)
-			if addrErr == nil {
-				res, err := queryClient.IBCAccount(context.Background(), &types.QueryIBCAccountRequest{Address: address.String()})
-				if err != nil {
-					return err
-				}
-
-				return clientCtx.PrintProto(res.Account)
-			}
-
-			res, err := queryClient.IBCAccountFromData(context.Background(), &types.QueryIBCAccountFromDataRequest{Data: args[0], Port: args[1], Channel: args[2]})
+			res, err := queryClient.IBCAccount(context.Background(), &types.QueryIBCAccountRequest{Address: address, ConnectionId: connectionId})
 			if err != nil {
 				return err
 			}
 
-			return clientCtx.PrintProto(res.Account)
+			return clientCtx.PrintProto(res)
 		},
 	}
 

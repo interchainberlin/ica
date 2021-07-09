@@ -195,7 +195,7 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet) error 
 }
 
 func (k Keeper) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Packet, data types.IBCAccountPacketData, ack channeltypes.Acknowledgement) error {
-	switch response := ack.Response.(type) {
+	switch ack.Response.(type) {
 	case *channeltypes.Acknowledgement_Error:
 		if k.hook != nil {
 			k.hook.OnTxFailed(ctx, packet.SourcePort, packet.SourceChannel, k.ComputeVirtualTxHash(data.Data, packet.Sequence), data.Data)
@@ -205,15 +205,6 @@ func (k Keeper) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Pac
 		if k.hook != nil {
 			k.hook.OnTxSucceeded(ctx, packet.SourcePort, packet.SourceChannel, k.ComputeVirtualTxHash(data.Data, packet.Sequence), data.Data)
 		}
-		// return if the interchain account address is already set
-		_, err := k.GetInterchainAccountAddress(ctx, packet.SourcePort)
-		if err == nil {
-			return nil
-		}
-
-		// if not keep track of the registered interchain account address
-		interchainAccountAddr := string(response.Result)
-		k.SetInterchainAccountAddress(ctx, packet.SourcePort, interchainAccountAddr)
 		return nil
 	default:
 		// the acknowledgement succeeded on the receiving chain so nothing

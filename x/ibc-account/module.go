@@ -1,8 +1,8 @@
 package ibc_account
 
 import (
-	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/cosmos/interchain-accounts/x/ibc-account/client/cli"
 
@@ -72,7 +72,6 @@ func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) 
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the ibc-account module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
-	types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
 }
 
 type AppModule struct {
@@ -208,15 +207,12 @@ func (am AppModule) OnRecvPacket(
 		return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-27 interchain account packet data: %s", err.Error())
 	}
 
-	//	err := am.keeper.OnRecvPacket(ctx, packet)
-	//	if err != nil {
-	//		ack = channeltypes.NewErrorAcknowledgement(fmt.Sprintf("cannot unmarshal interchain account packet data: %s", err.Error()))
-	//	}
+	err := am.keeper.OnRecvPacket(ctx, packet)
+	if err != nil {
+		ack = channeltypes.NewErrorAcknowledgement(fmt.Sprintf("cannot unmarshal interchain account packet data: %s", err.Error()))
+	}
 
-	_ = am.keeper.OnRecvPacket(ctx, packet)
-
-	interchainAccountAddr, _ := am.keeper.GetInterchainAccountAddress(ctx, packet.SourcePort)
-	bz := []byte(interchainAccountAddr)
+	bz := []byte("")
 	ack = channeltypes.NewResultAcknowledgement(bz)
 
 	return &sdk.Result{

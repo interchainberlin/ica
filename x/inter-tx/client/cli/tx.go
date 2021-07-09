@@ -71,21 +71,22 @@ func getRegisterAccountCmd() *cobra.Command {
 
 func getSendTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:  "send [to_address] [amount] --connection-id",
-		Args: cobra.ExactArgs(2),
+		Use:  "send [interchain_account_address] [to_address] [amount] --connection-id",
+		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			fromAddress := clientCtx.GetFromAddress()
-			toAddress, err := sdk.AccAddressFromBech32(args[0])
+			ownerAddr := clientCtx.GetFromAddress()
+			interchainAccountAddr := args[0]
+			toAddress := args[1]
 			if err != nil {
 				return err
 			}
 
-			amount, err := sdk.ParseCoinsNormalized(args[1])
+			amount, err := sdk.ParseCoinsNormalized(args[2])
 			if err != nil {
 				return err
 			}
@@ -93,11 +94,13 @@ func getSendTxCmd() *cobra.Command {
 			connectionId := viper.GetString(FlagConnectionId)
 
 			msg := types.NewMsgSend(
-				fromAddress,
+				interchainAccountAddr,
+				ownerAddr,
 				toAddress,
 				amount,
 				connectionId,
 			)
+
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

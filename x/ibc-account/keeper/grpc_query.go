@@ -24,40 +24,12 @@ func (k Keeper) IBCAccount(ctx context.Context, req *types.QueryIBCAccountReques
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	address, err := sdk.AccAddressFromBech32(req.Address)
+	portId := k.GeneratePortId(req.Address, req.ConnectionId)
+
+	address, err := k.GetInterchainAccountAddress(sdkCtx, portId)
 	if err != nil {
 		return nil, err
 	}
 
-	ibcAccount, err := k.GetIBCAccount(sdkCtx, address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.QueryIBCAccountResponse{Account: &ibcAccount}, nil
-}
-
-// IBCAccountFromData implements the Query/IBCAccount gRPC method
-func (k Keeper) IBCAccountFromData(ctx context.Context, req *types.QueryIBCAccountFromDataRequest) (*types.QueryIBCAccountResponse, error) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "empty request")
-	}
-
-	if req.Port == "" {
-		return nil, status.Error(codes.InvalidArgument, "port cannot be empty")
-	}
-
-	if req.Channel == "" {
-		return nil, status.Error(codes.InvalidArgument, "channel cannot be empty")
-	}
-
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	address := k.GenerateAddress("test")
-
-	ibcAccount, err := k.GetIBCAccount(sdkCtx, address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.QueryIBCAccountResponse{Account: &ibcAccount}, nil
+	return &types.QueryIBCAccountResponse{AccountAddress: address}, nil
 }

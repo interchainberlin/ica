@@ -28,11 +28,12 @@ message MsgRegisterAccountResponse {}
 
 // MsgSend is used to send coins from an interchain account to another account on the same chain
 message MsgSend {
-  bytes   sender                    = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  bytes   to_address                      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  repeated cosmos.base.v1beta1.Coin amount = 3
+  string   interchain_account              = 1;
+  bytes    owner                    = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+  string   to_address                      = 3;
+  repeated cosmos.base.v1beta1.Coin amount = 4
       [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
-  string  connectionId = 4;
+  string  connectionId = 5;
 }
 
 // MsgSendResponse defines the Msg/Send response type.

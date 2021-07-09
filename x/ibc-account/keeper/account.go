@@ -29,8 +29,8 @@ func (k Keeper) InitInterchainAccount(ctx sdk.Context, connectionId, owner strin
 
 	counterParty := channeltypes.Counterparty{PortId: "ibcaccount", ChannelId: ""}
 	order := channeltypes.Order(2)
-
 	channelId, cap, err := k.channelKeeper.ChanOpenInit(ctx, order, []string{connectionId}, portId, portCap, counterParty, types.Version)
+
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			channeltypes.EventTypeChannelOpenInit,
