@@ -14,9 +14,7 @@ func (keeper Keeper) TrySendCoins(
 	amt sdk.Coins,
 	connectionId string,
 ) error {
-	interchainAccountAddr := "cosmos1plyxrjdepap2zgqmfpzfchmklwqhchq5jrctm0"
-	msg := &banktypes.MsgSend{FromAddress: interchainAccountAddr, ToAddress: toAddr, Amount: amt}
-
+	msg := &banktypes.MsgSend{FromAddress: fromAddr, ToAddress: toAddr, Amount: amt}
 	_, err := keeper.iaKeeper.TryRunTx(ctx, owner, connectionId, msg)
 	return err
 }

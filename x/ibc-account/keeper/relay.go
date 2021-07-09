@@ -123,7 +123,38 @@ func (k Keeper) DeserializeTx(_ sdk.Context, txBytes []byte) ([]sdk.Msg, error) 
 	return res, nil
 }
 
-func (k Keeper) runTx(ctx sdk.Context, destPort, destChannel string, msgs []sdk.Msg) error {
+func (k Keeper) AuthenticateTx(ctx sdk.Context, msgs []sdk.Msg, portId string) error {
+	seen := map[string]bool{}
+	var signers []sdk.AccAddress
+	for _, msg := range msgs {
+		for _, addr := range msg.GetSigners() {
+			if !seen[addr.String()] {
+				signers = append(signers, addr)
+				seen[addr.String()] = true
+			}
+		}
+	}
+
+	interchainAccountAddr, err := k.GetInterchainAccountAddress(ctx, portId)
+	if err != nil {
+		return sdkerrors.ErrUnauthorized
+	}
+
+	for _, signer := range signers {
+		if interchainAccountAddr != signer.String() {
+			return sdkerrors.ErrUnauthorized
+		}
+	}
+
+	return nil
+}
+
+func (k Keeper) runTx(ctx sdk.Context, sourcePort, destPort, destChannel string, msgs []sdk.Msg) error {
+	err := k.AuthenticateTx(ctx, msgs, sourcePort)
+	if err != nil {
+		return err
+	}
+
 	for _, msg := range msgs {
 		err := msg.ValidateBasic()
 		if err != nil {
@@ -132,7 +163,6 @@ func (k Keeper) runTx(ctx sdk.Context, destPort, destChannel string, msgs []sdk.
 	}
 
 	cacheContext, writeFn := ctx.CacheContext()
-	var err error
 	for _, msg := range msgs {
 		_, msgErr := k.runMsg(cacheContext, msg)
 		if msgErr != nil {
@@ -183,7 +213,7 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet) error 
 			return err
 		}
 
-		err = k.runTx(ctx, packet.DestinationPort, packet.DestinationChannel, msgs)
+		err = k.runTx(ctx, packet.SourcePort, packet.DestinationPort, packet.DestinationChannel, msgs)
 		if err != nil {
 			return err
 		}
