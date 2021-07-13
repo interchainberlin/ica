@@ -15,6 +15,6 @@ func (keeper Keeper) TrySendCoins(
 	connectionId string,
 ) error {
 	msg := &banktypes.MsgSend{FromAddress: fromAddr, ToAddress: toAddr, Amount: amt}
-	_, err := keeper.iaKeeper.TryRunTx(ctx, owner, connectionId, msg)
+	_, err := keeper.iaKeeper.TrySendTx(ctx, owner, connectionId, msg)
 	return err
 }

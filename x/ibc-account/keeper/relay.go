@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
-func (k Keeper) TryRunTx(ctx sdk.Context, accountOwner sdk.AccAddress, connectionId string, data interface{}) ([]byte, error) {
+func (k Keeper) TrySendTx(ctx sdk.Context, accountOwner sdk.AccAddress, connectionId string, data interface{}) ([]byte, error) {
 	portId := k.GeneratePortId(accountOwner.String(), connectionId)
 	// Check for the active channel
 	activeChannelId, err := k.GetActiveChannel(ctx, portId)
@@ -149,7 +149,7 @@ func (k Keeper) AuthenticateTx(ctx sdk.Context, msgs []sdk.Msg, portId string) e
 	return nil
 }
 
-func (k Keeper) runTx(ctx sdk.Context, sourcePort, destPort, destChannel string, msgs []sdk.Msg) error {
+func (k Keeper) executeTx(ctx sdk.Context, sourcePort, destPort, destChannel string, msgs []sdk.Msg) error {
 	err := k.AuthenticateTx(ctx, msgs, sourcePort)
 	if err != nil {
 		return err
@@ -164,7 +164,7 @@ func (k Keeper) runTx(ctx sdk.Context, sourcePort, destPort, destChannel string,
 
 	cacheContext, writeFn := ctx.CacheContext()
 	for _, msg := range msgs {
-		_, msgErr := k.runMsg(cacheContext, msg)
+		_, msgErr := k.executeMsg(cacheContext, msg)
 		if msgErr != nil {
 			err = msgErr
 			break
@@ -181,9 +181,8 @@ func (k Keeper) runTx(ctx sdk.Context, sourcePort, destPort, destChannel string,
 	return nil
 }
 
-// RunMsg executes the message.
 // It tries to get the handler from router. And, if router exites, it will perform message.
-func (k Keeper) runMsg(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
+func (k Keeper) executeMsg(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 	handler := k.router.Route(ctx, msg.Route())
 	if handler == nil {
 		return nil, types.ErrInvalidRoute
@@ -213,7 +212,7 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet) error 
 			return err
 		}
 
-		err = k.runTx(ctx, packet.SourcePort, packet.DestinationPort, packet.DestinationChannel, msgs)
+		err = k.executeTx(ctx, packet.SourcePort, packet.DestinationPort, packet.DestinationChannel, msgs)
 		if err != nil {
 			return err
 		}
