@@ -30,7 +30,7 @@ type Keeper struct {
 
 	scopedKeeper capabilitykeeper.ScopedKeeper
 
-	msgRouter baseapp.MsgServiceRouter
+	msgRouter *baseapp.MsgServiceRouter
 	memKey    sdk.StoreKey
 }
 
@@ -39,7 +39,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	cdc codec.BinaryCodec, key sdk.StoreKey,
 	channelKeeper types.ChannelKeeper, portKeeper types.PortKeeper,
-	accountKeeper types.AccountKeeper, scopedKeeper capabilitykeeper.ScopedKeeper, msgRouter baseapp.MsgServiceRouter, hook types.IBCAccountHooks,
+	accountKeeper types.AccountKeeper, scopedKeeper capabilitykeeper.ScopedKeeper, msgRouter *baseapp.MsgServiceRouter, hook types.IBCAccountHooks,
 ) Keeper {
 	return Keeper{
 		storeKey:      key,
