@@ -4,7 +4,7 @@ import "fmt"
 
 const (
 	// ModuleName defines the IBC transfer name
-	ModuleName = "ibcaccount"
+	ModuleName = "interchainaccounts"
 
 	// Version defines the current version the IBC tranfer
 	// module supports
