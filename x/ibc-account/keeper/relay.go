@@ -183,7 +183,7 @@ func (k Keeper) executeTx(ctx sdk.Context, sourcePort, destPort, destChannel str
 
 // It tries to get the handler from router. And, if router exites, it will perform message.
 func (k Keeper) executeMsg(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
-	handler := k.router.Route(ctx, msg.Route())
+	handler := k.msgRouter.Handler(msg)
 	if handler == nil {
 		return nil, types.ErrInvalidRoute
 	}

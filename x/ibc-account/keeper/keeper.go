@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	baseapp "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,7 +12,6 @@ import (
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	host "github.com/cosmos/ibc-go/modules/core/24-host"
-
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
@@ -30,8 +30,8 @@ type Keeper struct {
 
 	scopedKeeper capabilitykeeper.ScopedKeeper
 
-	router types.Router
-	memKey sdk.StoreKey
+	msgRouter baseapp.MsgServiceRouter
+	memKey    sdk.StoreKey
 }
 
 // NewKeeper creates a new IBC account Keeper instance
@@ -39,7 +39,7 @@ func NewKeeper(
 	memKey sdk.StoreKey,
 	cdc codec.BinaryCodec, key sdk.StoreKey,
 	channelKeeper types.ChannelKeeper, portKeeper types.PortKeeper,
-	accountKeeper types.AccountKeeper, scopedKeeper capabilitykeeper.ScopedKeeper, router types.Router, hook types.IBCAccountHooks,
+	accountKeeper types.AccountKeeper, scopedKeeper capabilitykeeper.ScopedKeeper, msgRouter baseapp.MsgServiceRouter, hook types.IBCAccountHooks,
 ) Keeper {
 	return Keeper{
 		storeKey:      key,
@@ -48,7 +48,7 @@ func NewKeeper(
 		portKeeper:    portKeeper,
 		accountKeeper: accountKeeper,
 		scopedKeeper:  scopedKeeper,
-		router:        router,
+		msgRouter:     msgRouter,
 		memKey:        memKey,
 		hook:          hook,
 	}

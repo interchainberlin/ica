@@ -4,27 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cosmos/interchain-accounts/x/ibc-account/client/cli"
-
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	channeltypes "github.com/cosmos/ibc-go/modules/core/04-channel/types"
-
-	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/gorilla/mux"
+	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	abci "github.com/tendermint/tendermint/abci/types"
+
+	channeltypes "github.com/cosmos/ibc-go/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/modules/core/exported"
+	"github.com/cosmos/interchain-accounts/x/ibc-account/client/cli"
 	"github.com/cosmos/interchain-accounts/x/ibc-account/keeper"
 	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
-	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
 )
 
 var (
@@ -44,11 +42,11 @@ func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	types.RegisterLegacyAminoCodec(cdc)
 }
 
-func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
+func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	return cdc.MustMarshalJSON(types.DefaultGenesis())
 }
 
-func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxEncodingConfig, bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncodingConfig, bz json.RawMessage) error {
 	return nil
 }
 
@@ -112,7 +110,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
-func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
 	cdc.MustUnmarshalJSON(data, &genesisState)
 
@@ -120,10 +118,13 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data j
 	return []abci.ValidatorUpdate{}
 }
 
-func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
+func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
 	gs := ExportGenesis(ctx, am.keeper)
 	return cdc.MustMarshalJSON(gs)
 }
+
+// ConsensusVersion implements AppModule/ConsensusVersion.
+func (AppModule) ConsensusVersion() uint64 { return 1 }
 
 // BeginBlock implements the AppModule interface
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
@@ -200,30 +201,33 @@ func (am AppModule) OnChanCloseConfirm(
 func (am AppModule) OnRecvPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
-) (*sdk.Result, []byte, error) {
-	var ack channeltypes.Acknowledgement
+	_ sdk.AccAddress,
+) ibcexported.Acknowledgement {
+	ack := channeltypes.NewResultAcknowledgement([]byte{byte(1)})
+
 	var data types.IBCAccountPacketData
 	if err := types.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
-		return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal ICS-27 interchain account packet data: %s", err.Error())
+		ack = channeltypes.NewErrorAcknowledgement(fmt.Sprintf("cannot unmarshal ICS-27 interchain account packet data: %s", err.Error()))
 	}
 
-	err := am.keeper.OnRecvPacket(ctx, packet)
-	if err != nil {
-		ack = channeltypes.NewErrorAcknowledgement(fmt.Sprintf("cannot unmarshal interchain account packet data: %s", err.Error()))
+	// only attempt the application logic if the packet data
+	// was successfully decoded
+	if ack.Success() {
+		err := am.keeper.OnRecvPacket(ctx, packet)
+		if err != nil {
+			ack = channeltypes.NewErrorAcknowledgement(err.Error())
+		}
 	}
 
-	bz := []byte("")
-	ack = channeltypes.NewResultAcknowledgement(bz)
-
-	return &sdk.Result{
-		Events: ctx.EventManager().Events().ToABCIEvents(),
-	}, ack.GetBytes(), nil
+	// NOTE: acknowledgement will be written synchronously during IBC handler execution.
+	return ack
 }
 
 func (am AppModule) OnAcknowledgementPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
 	acknowledgement []byte,
+	_ sdk.AccAddress,
 ) (*sdk.Result, error) {
 	var ack channeltypes.Acknowledgement
 
@@ -247,6 +251,7 @@ func (am AppModule) OnAcknowledgementPacket(
 func (am AppModule) OnTimeoutPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
+	_ sdk.AccAddress,
 ) (*sdk.Result, error) {
 	// TODO
 	return nil, nil
