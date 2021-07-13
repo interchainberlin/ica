@@ -11,7 +11,7 @@ import (
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
+	channeltypes "github.com/cosmos/ibc-go/modules/core/04-channel/types"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -20,7 +20,7 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
+	porttypes "github.com/cosmos/ibc-go/modules/core/05-port/types"
 	"github.com/cosmos/interchain-accounts/x/ibc-account/keeper"
 	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	"github.com/gorilla/mux"

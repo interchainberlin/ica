@@ -21,7 +21,7 @@ The most important part of the IBC account keeper, as shown above, is the **map 
 
 The `TxEncoder` serializes the source chain's tx bytes from any data. And the map of `TxEncoder` has the key, such as `chain-id` and `keeper`, which the keeper uses to send packets. Therefore, it is necessary to know which source chain's transaction is being executed.
 
-`SerializeCosmosTx(cdc codec.BinaryMarshaler, registry codectypes.InterfaceRegistry)` provides a way to serialize the tx bytes from messages if the destination chain is based on the Cosmos-SDK.
+`SerializeCosmosTx(cdc codec.BinaryCodec, registry codectypes.InterfaceRegistry)` provides a way to serialize the tx bytes from messages if the destination chain is based on the Cosmos-SDK.
 
 The router is used to delegate the process of handling the message to a module. When a packet which requests a set of transaction bytes to be run is passed, the router deserializes the tx bytes and passes the message to the handler. The keeper checks the result of each message, and if any message returns an error, the entire transaction is aborted, and state change rolled back.
 

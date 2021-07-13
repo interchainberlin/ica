@@ -10,7 +10,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
+	host "github.com/cosmos/ibc-go/modules/core/24-host"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -20,7 +20,7 @@ import (
 // Keeper defines the IBC transfer keeper
 type Keeper struct {
 	storeKey sdk.StoreKey
-	cdc      codec.BinaryMarshaler
+	cdc      codec.BinaryCodec
 
 	hook types.IBCAccountHooks
 
@@ -37,7 +37,7 @@ type Keeper struct {
 // NewKeeper creates a new IBC account Keeper instance
 func NewKeeper(
 	memKey sdk.StoreKey,
-	cdc codec.BinaryMarshaler, key sdk.StoreKey,
+	cdc codec.BinaryCodec, key sdk.StoreKey,
 	channelKeeper types.ChannelKeeper, portKeeper types.PortKeeper,
 	accountKeeper types.AccountKeeper, scopedKeeper capabilitykeeper.ScopedKeeper, router types.Router, hook types.IBCAccountHooks,
 ) Keeper {
@@ -54,7 +54,7 @@ func NewKeeper(
 	}
 }
 
-func (k Keeper) SerializeCosmosTx(cdc codec.BinaryMarshaler, data interface{}) ([]byte, error) {
+func (k Keeper) SerializeCosmosTx(cdc codec.BinaryCodec, data interface{}) ([]byte, error) {
 	msgs := make([]sdk.Msg, 0)
 	switch data := data.(type) {
 	case sdk.Msg:
@@ -80,10 +80,10 @@ func (k Keeper) SerializeCosmosTx(cdc codec.BinaryMarshaler, data interface{}) (
 	}
 
 	txRaw := &types.IBCTxRaw{
-		BodyBytes: cdc.MustMarshalBinaryBare(txBody),
+		BodyBytes: cdc.MustMarshal(txBody),
 	}
 
-	bz, err := cdc.MarshalBinaryBare(txRaw)
+	bz, err := cdc.Marshal(txRaw)
 	if err != nil {
 		return nil, err
 	}

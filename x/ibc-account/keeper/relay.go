@@ -5,9 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
-	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
+	clienttypes "github.com/cosmos/ibc-go/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/modules/core/04-channel/types"
+	host "github.com/cosmos/ibc-go/modules/core/24-host"
 	"github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
@@ -97,14 +97,14 @@ func (k Keeper) createOutgoingPacket(
 func (k Keeper) DeserializeTx(_ sdk.Context, txBytes []byte) ([]sdk.Msg, error) {
 	var txRaw types.IBCTxRaw
 
-	err := k.cdc.UnmarshalBinaryBare(txBytes, &txRaw)
+	err := k.cdc.Unmarshal(txBytes, &txRaw)
 	if err != nil {
 		return nil, err
 	}
 
 	var txBody types.IBCTxBody
 
-	err = k.cdc.UnmarshalBinaryBare(txRaw.BodyBytes, &txBody)
+	err = k.cdc.Unmarshal(txRaw.BodyBytes, &txBody)
 	if err != nil {
 		return nil, err
 	}
