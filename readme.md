@@ -1,6 +1,4 @@
 # Interchain Accounts
-This repo contains an ongoing refactor/update of https://github.com/chainapsis/cosmos-sdk-interchain-account which is based on the [ics-27 spec.](https://github.com/cosmos/ics/tree/master/spec/ics-027-interchain-accounts)
-
 ## Local Demo
 
 ### Setup
@@ -60,27 +58,6 @@ icad tx intertx send cosmos1plyxrjdepap2zgqmfpzfchmklwqhchq5jrctm0 $VAL_2 500sta
 # Wait until the relayer has relayed the packet
 
 # Check if the balance has been changed (it should now be 500stake)
-icad q bank balances $IBC_ACCOUNT --chain-id test-2 --node tcp://localhost:26657
-
-## Test channel closing 
-
-# Close the previously opened channel
-hermes -c ./network/hermes/config.toml tx raw chan-close-init -d channel-0 -s channel-0 test-2 test-1 connection-0 ibcaccount ics27-1-0-cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am
-
-# Test sending assets from interchain account via ibc.
-icad tx intertx send cosmos1plyxrjdepap2zgqmfpzfchmklwqhchq5jrctm0 $VAL_2 500stake --connection-id conection-0 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 --from val1 -y
-## You should recieve an error saying the channel is CLOSED
-
-## Make sure you stop the hermes relayer for the next step (the script won't work otherwise)
-./network/hermes/create-test-channel-2.sh
-
-# start the relayer again
-make start-rly
-
-# Try to send again
-icad tx intertx send cosmos1plyxrjdepap2zgqmfpzfchmklwqhchq5jrctm0 $VAL_2 500stake --connection-id conection-0 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 --from val1 -y
-
-# Check balance (it should be 0 now upon successful intertx send)
 icad q bank balances $IBC_ACCOUNT --chain-id test-2 --node tcp://localhost:26657
 ```
 
