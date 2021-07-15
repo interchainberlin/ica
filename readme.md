@@ -31,7 +31,7 @@ export VAL_1=cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am
 export VAL_2=cosmos17dtl0mjt3t77kpuhg2edqzjpszulwhgzuj9ljs
 
 # Register an IBC Account on chain test-2 
-icad tx intertx register --from val1 --connection-id connection-0 --chain-id test-1 --gas 150000 --home ./data/test-1 --node tcp://localhost:16657 -y
+icad tx intertx register --from val1 --connection-id connection-0 --chain-id test-1 --gas 150000 --home ./data/test-1 --node tcp://localhost:16657 --keyring-backend test -y
 
 # Start the hermes relayer in the first terminal
 # This will also finish the channel creation handshake signalled during the register step
@@ -47,13 +47,13 @@ export IBC_ACCOUNT=cosmos1plyxrjdepap2zgqmfpzfchmklwqhchq5jrctm0
 icad q bank balances $IBC_ACCOUNT --chain-id test-2 --node tcp://localhost:26657
 
 # Send some assets to $IBC_ACCOUNT.
-icad tx bank send val2 $IBC_ACCOUNT 1000stake --chain-id test-2 --home ./data/test-2 --node tcp://localhost:26657 -y
+icad tx bank send val2 $IBC_ACCOUNT 1000stake --chain-id test-2 --home ./data/test-2 --node tcp://localhost:26657 --keyring-backend test -y
 
 # Check that the balance has been updated
 icad q bank balances $IBC_ACCOUNT --chain-id test-2 --node tcp://localhost:26657
 
 # Test sending assets from interchain account via ibc.
-icad tx intertx send cosmos1plyxrjdepap2zgqmfpzfchmklwqhchq5jrctm0 $VAL_2 500stake --connection-id conection-0 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 --from val1 -y
+icad tx intertx send cosmos1plyxrjdepap2zgqmfpzfchmklwqhchq5jrctm0 $VAL_2 500stake --connection-id conection-0 --chain-id test-1 --gas 90000 --home ./data/test-1 --node tcp://localhost:16657 --from val1 --keyring-backend test -y
 
 # Wait until the relayer has relayed the packet
 
